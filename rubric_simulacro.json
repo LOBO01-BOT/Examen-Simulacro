@@ -1,0 +1,164 @@
+{
+  "tp_metadata": {
+    "tp_id": "LAB1-2026-EXAMEN-SIMULACRO",
+    "title": "Simulacro de Examen Integrador: Teoría (TP1–TP5) y Práctica en Prolog (TP7)",
+    "catedra": "Laboratorio I - Tecnicatura Universitaria en Automatización y Robótica / Informática - UCSE DASS",
+    "ciclo": 2026,
+    "docente": "Ing. Fabio D. Argañaraz",
+    "version": "2.0.0"
+  },
+  "security": {
+    "algorithm": "SHA-256 + Salted HMAC + Canonical Prolog AST Alpha-Hash",
+    "protected": true
+  },
+  "max_score": 100,
+  "exercises": {
+    "ej1_teoria_tp1": {
+      "part": "teoria",
+      "weight": 10,
+      "biblio": "Russell & Norvig Cap. 1.1 (pp. 1–5) y Cap. 2.1–2.3 (pp. 34–46) • Diapositivas Clase 1 (Slides 15–18) y Clase 3.1 (Slides 5–14).",
+      "feedback": "El paradigma central de Russell & Norvig es Actuar Racionalmente (Agentes Racionales). La Función de Agente es el mapeo matemático abstracto f: P* -> A y el Programa es su implementación concreta. En un vehículo autónomo, cámaras/LiDAR/GPS son Sensores, y el Test de Turing Total exige Visión Computacional y Robótica.",
+      "hashes": {
+        "item_paradigma_russell_norvig": "63a2f61745162581bbcb5528e5458ae8ace44b97c3f4bab44882b16336d81103",
+        "item_funcion_vs_programa": "105155dee69e4afddbefda551ac2dff228ade78eae63237ab2aba4eaf954bd7e",
+        "item_peas_vehiculo_autonomo": "dbcacec6ae97f16390e6635a5718bcaeed0e3fb22347ab7bb199b041bc3b9daa",
+        "item_test_turing_total": "9d3cd89fcab2ebe03604b4657844a66c560fa994637e7d49e1a07e27060d3062"
+      }
+    },
+    "ej2_teoria_tp2": {
+      "part": "teoria",
+      "weight": 10,
+      "biblio": "Russell & Norvig Cap. 3.1–3.4 (pp. 64–87, Tabla 3.17) • Diapositivas Clase 3.2 (Slides 4–15, 37–58).",
+      "feedback": "La función de costo de camino g(n) suma los costos individuales de los pasos desde el estado inicial. Un Nodo de búsqueda es una estructura de datos que almacena estado, padre, acción, costo g(n) y profundidad d. BFS utiliza una cola FIFO con memoria exponencial O(bᵈ), mientras que DFS utiliza una pila LIFO con memoria lineal O(b·m).",
+      "hashes": {
+        "item_formulacion_costo_camino": "22b134ddc6d92c8f7d878f03a0398ebdd11e8a8deb64ead7a2f062b9e1f843c6",
+        "item_diferencia_nodo_estado": "47693afaf970e07c3b473465961ee021243908c468ca001f4c54eacdb356d456",
+        "item_bfs_cola_memoria": "43e0474ee7fe18da41632e902052de72e101c8afcf1c823abcd90d3e1ee0170a",
+        "item_dfs_ventaja_desventaja": "ae48be56a56d649da44027a8afd60202ed9da58f87eb806c4ef7004ce31232e9"
+      }
+    },
+    "ej3_teoria_tp3": {
+      "part": "teoria",
+      "weight": 10,
+      "biblio": "Russell & Norvig Cap. 4.1.1–4.1.3 (pp. 98–110) • Diapositivas Clase 4 (Slides 1–23).",
+      "feedback": "La búsqueda voraz evalúa f(n) = h(n), lo que en Iasi -> Fagaras induce a entrar en el callejón sin salida de Neamt. A* evalúa f(n) = g(n) + h(n) (costo estimado de la solución más barata a través de n) y garantiza optimalidad en árboles si h(n) es admisible (0 <= h(n) <= h*(n)).",
+      "hashes": {
+        "item_voraz_funcion_trampa": "f91459618a68f18e89584ac9105ec8fe3d36b2e67275dc5722ea5be8cabc23dc",
+        "item_a_star_significado_f": "e3c10bd18c6b99d45df8fadbeed46e29b9ff7358c1397b46af25c921a76ad3b4",
+        "item_a_star_momento_test_meta": "5c18894a621d462c59e91a7a9955a0ebf824e581df4dd663a76e954bc1c689d3",
+        "item_definicion_heuristica_admisible": "9254131cb6daa6bb6742b1f5c934ef0324ca2a1b07abe780b58cb0cad7904e7c"
+      }
+    },
+    "ej4_teoria_tp4": {
+      "part": "teoria",
+      "weight": 10,
+      "biblio": "Russell & Norvig Cap. 7.1–7.5 (pp. 194–215) • Diapositivas Clase 5 (`5 - Conocimiento y Razonamiento.pptx`).",
+      "feedback": "Un Agente Basado en Conocimiento articula una Base de Conocimiento (KB) declarativa con un Motor de Inferencia. La sintaxis define las configuraciones legítimas de símbolos y la semántica define la verdad en los modelos. Un procedimiento es robusto (sound) si solo deriva sentencias implicadas lógicamente (KB |= alpha). Una tautología (como P v ~P) es válida.",
+      "hashes": {
+        "item_arquitectura_agente_kb": "cc7d1ca0949b690fae19cf3e431d8f32c9b699795b386d04a38b26f9048097a1",
+        "item_sintaxis_vs_semantica": "d48488cd7cced412cbd7b772e9188abca38d69a4e8b9487ae3a019592c6b0a54",
+        "item_propiedad_robustez_soundness": "24c760a8e21fe46fb7474d3e0318542cf84ca0cf0ede8f5e63b9da755fc9ea4a",
+        "item_clasificacion_sentencia_valida": "3a9ecb5b54a7d1455e62903c7bcfc75c49962ddd61f754773718d7ed332a94cc"
+      }
+    },
+    "ej5_teoria_tp5": {
+      "part": "teoria",
+      "weight": 10,
+      "biblio": "Russell & Norvig Cap. 8.1–8.3 (pp. 240–258) • Diapositivas Clase 6 (`6 - Lógica de Primer Orden.pptx`, Slides 2–11).",
+      "feedback": "La LPO asume que el mundo contiene objetos, relaciones (predicados) y funciones. Un símbolo de función como PiernaIzquierda(Richard) devuelve un objeto (es un término, no una sentencia booleana). El cuantificador universal (∀) se asocia con la implicación (⇒), mientras que el existencial (∃) se asocia con la conjunción (∧).",
+      "hashes": {
+        "item_compromiso_ontologico_lpo": "18fdc5ae6f462acfb5588974e3c3cc202ae177b87fc57270ba44e422484a0277",
+        "item_clasificacion_sintaxis_funcion": "791f3129205e08bd1537d837a4489a7726518cb753e3bf06ee85eb00561b321d",
+        "item_cuantificador_universal_conector": "838bbeeb3ec3745658072f9f9120b730ba14cbf8c73d46953e4ec63222b01751",
+        "item_cuantificador_existencial_conector": "b8a7228ee0837a022c9cbe4aec1f165aaa7427cc8ef770d1584e70bda422aa82"
+      }
+    },
+    "ej6_practica_caso1": {
+      "part": "practica",
+      "weight": 25,
+      "kb_weight": 13,
+      "questions_weight": 12,
+      "pl_file": "caso1_hospital.pl",
+      "expected_pred_sigs": [
+        "atiende/2",
+        "turno/2",
+        "complejidad/2",
+        "guardia_critica/1",
+        "especialista_manana/2"
+      ],
+      "biblio": "Russell & Norvig Cap. 9.4–9.5 (pp. 302–308) • Diapositivas Clase 7 (`7 - Lógica aplicada en PROLOG.pptx`, Slides 6–17).",
+      "feedback": "En el dominio hospitalario, debes declarar los 9 hechos (3 de atiende/2, 3 de turno/2 y 3 de complejidad/2) con átomos en minúscula y punto final, además de las reglas guardia_critica/1 y especialista_manana/2. Las consultas con variables libres instancian soluciones por backtracking y las consultas no derivables retornan false bajo el Supuesto de Mundo Cerrado (CWA).",
+      "kb_facts_hashes": [
+        "4991644a99017d945df9b91e25bbf236cfc8d5fec1ced0b9d19f3efc42ca7bc4",
+        "1a8a949810ddb3194e3410604d4d049c9442a58bdbd6df4c9e4221da179b5571",
+        "5eff5229a8aed9490edfa96271434918281ac1f4fbd685f7fe53df307c4ffc32",
+        "b892fb8726ebe4dae033421c62b99b8ae3b718607160d04e7289e45ae4a1ba6f",
+        "102baa05d4a76f90dd75ce9775e0dfb2460384a0478b33f033fdf1df5ca0f5c8",
+        "292b1b925ec59243aef4051fc0f1292ec0e578f2a028378a809e557731811ebc",
+        "ff143111e247b7e7e4638eefff51f481c3ac68d580d6147df295d3a62cb450cc",
+        "7daeeedcf3e5cbe8d13bdf904506887ce3d346406a68d26c79c4e6461e3ad59b",
+        "8d1d34df038d51844077a3b6ff71d778c50615db35d0557ba3083673992204ab"
+      ],
+      "kb_rules_hashes": {
+        "guardia_critica/1": [
+          "c3f2d328ae144419dab3c73fca2d0277352b9c5d01091f2295d6e6e5368381fc"
+        ],
+        "especialista_manana/2": [
+          "76b4bb45fc81d841393feef91eb31f1b4e0360fc8e663b1a7ea3d531bdd620d6"
+        ]
+      },
+      "hashes": {
+        "item_proposito_discontiguous_hospital": "e5b69b0c91eae209c03d6ca9baba05055adff33fbd8d3b350d7c7b2bf63203c7",
+        "item_consulta_medicos_manana": "ddf81ba7a65beb305d35412c1b74ffc46d806526b7bbd09fc8b09d5dc819314a",
+        "item_backtracking_guardia_critica": "2e0c37153305353a235d8dbef6a57a8202b3958921253e844fd6d5c5baba621c",
+        "item_evaluacion_paz_critica": "b588388f2eac110a9ea729e14a78cbc09e73c135d016b3efcfa1177e38d2d449",
+        "item_consulta_especialista_manana_conjuncion": "4d62e87e78085410aef1258a959b53f4e2e2cb424e53fa846d05e18553b2ab41",
+        "item_evaluacion_luna_critica_cwa": "f5f7c37debca68184ae04d97f207117a295fc49f3922671ec8c7958f2b47d88c"
+      }
+    },
+    "ej7_practica_caso2": {
+      "part": "practica",
+      "weight": 25,
+      "kb_weight": 13,
+      "questions_weight": 12,
+      "pl_file": "caso2_agro_iot.pl",
+      "expected_pred_sigs": [
+        "cultivo/2",
+        "humedad/2",
+        "sistema_riego/2",
+        "requiere_riego_urgente/1",
+        "lote_goteo_seco/2"
+      ],
+      "biblio": "Russell & Norvig Cap. 9.4–9.5 (pp. 302–308) • Diapositivas Clase 7 (`7 - Lógica aplicada en PROLOG.pptx`, Slides 11–20).",
+      "feedback": "En el sistema Agro-IoT, debes declarar los 9 hechos (3 de cultivo/2, 3 de humedad/2 y 3 de sistema_riego/2) y las reglas requiere_riego_urgente/1 y lote_goteo_seco/2. Solo lote_norte satisface simultáneamente suelo seco y riego por goteo.",
+      "kb_facts_hashes": [
+        "eebbe174cfb6bf786f4aea3d42726a2caeb0c24c41e2f8c107f1dd765a50c34b",
+        "1cea86a6bff3f25efa6432da52af26dfe4aeb3107aa5bd3734d35d1dd5cd1c5f",
+        "76dfaab35b18cab9d5e02f484d74e3b415494ec7919de8aed65cc60ea8f260ad",
+        "d0371bf0ea5fcc86b20160bc3ae4e09f72b6130d028713483341504bbc3c905e",
+        "bca18fb5a05e642f47e7d69caa26d07634d7a4b3a1ae4824ae81ce0eecc50343",
+        "3e6535eec8772e68d4a635927e72724cc0e70c3a257531786fdc34fbf3f6873a",
+        "50de451ba3e8c6f30b59b0d195494d2db8d7608e56915bc71eca5f0e409a62ef",
+        "1968e02430d3323ae7271c69ac817fa8556472ba20b6eced5d99e9030c050959",
+        "1166aaba040e69ab161a4c059dd53956c3f6d8d28111bc243c89fec0df250459"
+      ],
+      "kb_rules_hashes": {
+        "requiere_riego_urgente/1": [
+          "56d967e5255f03fb9f883a4b962dcae7d2d9611a96a58cf6a55ab9194325ca8e"
+        ],
+        "lote_goteo_seco/2": [
+          "81a49d309567f0a07cbac68b2680230ca50439dedbb9c061bed239bbdfe7113f",
+          "097c9ab1e34055ba6a7b996585ef402eca8fc3ee0e46ec180efb3da41559ce03"
+        ]
+      },
+      "hashes": {
+        "item_convencion_edimburgo_atomos": "53588a58de03dabaa48585eb0e92f55cdc77e41cdab69430d61de8472700b34c",
+        "item_consulta_lotes_goteo": "809391f5576eccdbcee358e0681cd4765e86f2764d0fc4a5f253de7067e58fab",
+        "item_backtracking_riego_urgente": "397eaaa3339ea3ba5c06f1bd7d4ddfdc1f0d1d46e213e3b68d8b386390c40ab8",
+        "item_resultado_lote_goteo_seco": "448e75c9ce8522a2136b0eb75a2a0aa6aba8ef57333e5f94a9791b1ba26a2b84",
+        "item_variable_anonima_agro": "4fe777e1cd4bd030157076f2e6458b1fc51e19b6c38287d1a3a37e861e56f9ad",
+        "item_evaluacion_central_urgente_cwa": "e5b5d04fcf182524c1e90c153b8c515b19bf2c7e40b50d61cb68e435a9d911ec"
+      }
+    }
+  }
+}

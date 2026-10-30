@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <script>
+    (function() {
+      try {
+        var s = localStorage.getItem("ucse_color_scheme");
+        var meta = document.querySelector('meta[name="color-scheme"]');
+        if (meta && (s === "dark" || s === "light")) meta.content = s;
+        if (s === "dark") document.documentElement.classList.add("dark");
+      } catch (e) {}
+    })();
+  </script>
+  <title>Simulacro de Examen Integrador | Laboratorio I — UCSE DASS</title>
+
+  <!-- Tailwind CSS Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            ucse: {
+              navy: '#01305B',
+              navymid: '#023967',
+              blue: '#1569AE',
+              cyan: '#0080FB',
+              sky: '#6EC1E4',
+              gold: '#FFED00',
+              goldwarm: '#FDD247',
+              bg: '#F4F6F9'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts Oficiales de https://www.ucse.edu.ar/: Montserrat, Roboto y JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Montserrat:wght@600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Hoja de estilos institucionales UCSE -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-[#F4F6F9] dark:bg-[#01182E] text-[#212529] dark:text-slate-100 min-h-screen antialiased selection:bg-[#01305B] selection:text-[#FFED00]">
+
+  <!-- =========================================================================
+       TOPBAR INSTITUCIONAL UCSE (Estilo https://www.ucse.edu.ar/ - #01305B)
+  ========================================================================== -->
+  <div class="ucse-topbar bg-[#01305B] text-white border-b border-[#1569AE]/40 text-xs">
+    <div class="max-w-6xl mx-auto px-4 py-2 flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2 font-medium tracking-wide">
+        <span class="px-2 py-0.5 rounded bg-[#FFED00] text-[#01305B] font-extrabold text-[11px]">UCSE • DASS</span>
+        <span class="hidden sm:inline text-slate-200">Universidad Católica de Santiago del Estero &bull; Departamento Académico San Salvador</span>
+      </div>
+      <div class="flex items-center gap-3" id="exam-timer-controls">
+        <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#023967] border border-[#6EC1E4]/30">
+          <span>⏱️</span>
+          <span id="timer-display" class="prolog-code font-bold text-[#FFED00] text-xs">90:00</span>
+        </div>
+        <button type="button" id="btn-timer-toggle" class="px-2.5 py-1 rounded bg-[#FFED00] hover:bg-[#FDD247] text-[#01305B] font-bold transition text-[11px]">
+          ▶ Iniciar
+        </button>
+        <button type="button" id="btn-timer-reset" class="px-2 py-1 rounded bg-[#023967] hover:bg-[#1569AE] text-white border border-white/20 transition text-[11px]" title="Reiniciar cronómetro a 90 minutos">
+          ↺
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       STICKY HEADER INSTITUCIONAL UCSE (Logo, Progreso Global y Controles)
+  ========================================================================== -->
+  <header class="sticky-toolbar sticky top-0 z-40 backdrop-blur-md bg-white/95 dark:bg-[#023967]/95 border-b-4 border-[#0080FB] shadow-md">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+
+      <!-- Marca Institucional UCSE -->
+      <div class="flex items-center gap-3">
+        <a href="https://www.ucse.edu.ar/" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2.5 group">
+          <img src="https://www.ucse.edu.ar/wp-content/uploads/2019/09/logo_ucse-e1568123600906.png" alt="Logo UCSE" class="h-10 w-auto object-contain bg-white rounded px-1.5 py-0.5 border border-slate-200 shadow-sm" onerror="this.style.display='none'">
+          <div>
+            <span class="text-[11px] font-extrabold uppercase tracking-wider text-[#1569AE] dark:text-[#FFED00] block">Laboratorio I &bull; IA y Agentes</span>
+            <h1 class="text-sm md:text-base font-extrabold text-[#01305B] dark:text-white ucse-heading">Simulacro de Examen Integrador</h1>
+          </div>
+        </a>
+      </div>
+
+      <!-- Indicador de Progreso Exclusivo de Consignas (34 ítems: 20 Teoría + 2 KB + 12 Consultas) -->
+      <div class="flex-1 max-w-xs min-w-[210px]">
+        <div class="flex justify-between text-xs mb-1">
+          <span id="progress-text" class="text-slate-600 dark:text-slate-200 font-bold">0 de 34 completados</span>
+          <span id="progress-percent" class="text-[#01305B] dark:text-[#FFED00] font-extrabold">0%</span>
+        </div>
+        <div class="w-full bg-slate-200 dark:bg-[#01182E] h-2.5 rounded-full overflow-hidden border border-slate-300 dark:border-[#1569AE]">
+          <div id="progress-bar" class="bg-gradient-to-r from-[#01305B] via-[#1569AE] to-[#0080FB] dark:from-[#0080FB] dark:to-[#FFED00] h-full w-0 transition-all duration-300 rounded-full"></div>
+        </div>
+        <div class="flex justify-between text-[10px] text-slate-500 dark:text-slate-300 mt-1 font-medium">
+          <span id="progress-teoria">Teoría: 0/20</span>
+          <span id="progress-practica">Práctica (KB+Consultas): 0/14</span>
+        </div>
+      </div>
+
+      <!-- Botones Globales Obligatorios -->
+      <div class="flex items-center gap-2">
+        <button type="button" id="btn-open-biblio-all" class="px-2.5 py-1.5 text-xs font-bold rounded-lg bg-[#F4F6F9] dark:bg-[#01182E] hover:bg-slate-200 text-[#01305B] dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] transition flex items-center gap-1.5">
+          <span>📖</span> <span class="hidden md:inline">Bibliografía</span>
+        </button>
+        <button type="button" id="btn-git-guide" class="px-2.5 py-1.5 text-xs font-bold rounded-lg bg-[#F4F6F9] dark:bg-[#01182E] hover:bg-slate-200 text-[#01305B] dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] transition flex items-center gap-1.5">
+          <span>🐙</span> <span class="hidden md:inline">Guía Entrega</span>
+        </button>
+        <button type="button" id="theme-toggle-btn" class="p-1.5 text-xs rounded-lg bg-[#F4F6F9] dark:bg-[#01182E] hover:bg-slate-200 text-[#01305B] dark:text-[#FFED00] border border-[#B6C9DB] dark:border-[#1569AE] transition" title="Alternar Tema Institucional Claro / Oscuro">
+          🌓
+        </button>
+        <button type="button" id="btn-export-json" class="px-3.5 py-1.5 text-xs font-extrabold rounded-lg bg-[#01305B] hover:bg-[#1569AE] text-[#FFED00] shadow transition flex items-center gap-1.5">
+          <span>💾</span> <span>Exportar (.json)</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       CONTENIDO PRINCIPAL DEL EXAMEN
+  ========================================================================== -->
+  <main class="max-w-6xl mx-auto px-4 py-8 space-y-10">
+
+    <!-- Portada Institucional UCSE y Datos del Estudiante -->
+    <section class="ucse-card p-6 md:p-8 bg-white dark:bg-[#023967] border border-slate-200 dark:border-[#154D80] space-y-6">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-200 dark:border-[#154D80] pb-5">
+        <div class="space-y-2">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#01305B] text-[#FFED00] text-xs font-extrabold tracking-wide">
+            <span>🏛️</span> SIMULACRO OFICIAL DE EXAMEN • 2026
+          </div>
+          <h2 class="text-2xl md:text-3xl font-extrabold text-[#01305B] dark:text-white ucse-heading">
+            Simulacro de Examen Integrador: Teoría (TP1–TP5) y Práctica en Prolog (TP7)
+          </h2>
+          <p class="text-slate-600 dark:text-slate-200 text-sm leading-relaxed max-w-4xl">
+            Evaluación formativa integral sobre Fundamentos de IA, Agentes Racionales, Búsqueda No Informada e Informada, Representación del Conocimiento, Lógica de Primer Orden y Modelado Práctico en SWI-Prolog.
+          </p>
+        </div>
+        <div class="grid grid-cols-2 gap-2.5 shrink-0 text-center">
+          <div class="p-3 rounded-xl bg-[#F4F6F9] dark:bg-[#01182E] border border-[#B6C9DB] dark:border-[#1569AE]">
+            <span class="text-[11px] uppercase font-bold text-slate-500 dark:text-slate-400 block">Parte I: Teoría</span>
+            <span class="text-lg font-extrabold text-[#01305B] dark:text-[#6EC1E4] ucse-heading">50 Puntos</span>
+            <span class="text-[11px] text-slate-500 dark:text-slate-300 block">TP1 a TP5 (20 ítems)</span>
+          </div>
+          <div class="p-3 rounded-xl bg-[#F4F6F9] dark:bg-[#01182E] border border-[#B6C9DB] dark:border-[#1569AE]">
+            <span class="text-[11px] uppercase font-bold text-slate-500 dark:text-slate-400 block">Parte II: Práctica</span>
+            <span class="text-lg font-extrabold text-[#01305B] dark:text-[#FFED00] ucse-heading">50 Puntos</span>
+            <span class="text-[11px] text-slate-500 dark:text-slate-300 block">26p KB Prolog + 24p Consultas</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Datos de Identificación del Estudiante -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div>
+          <label for="student-name" class="block text-xs font-bold text-[#01305B] dark:text-slate-200 mb-1">Nombre y Apellido *</label>
+          <input type="text" id="student-name" placeholder="Ej: Valentina Alarcón" class="w-full bg-[#F4F6F9] dark:bg-[#01182E] text-slate-900 dark:text-white border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0080FB]">
+        </div>
+        <div>
+          <label for="student-id" class="block text-xs font-bold text-[#01305B] dark:text-slate-200 mb-1">DNI / Legajo UCSE *</label>
+          <input type="text" id="student-id" placeholder="Ej: 44.123.456" class="w-full bg-[#F4F6F9] dark:bg-[#01182E] text-slate-900 dark:text-white border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0080FB]">
+        </div>
+        <div>
+          <label for="student-email" class="block text-xs font-bold text-[#01305B] dark:text-slate-200 mb-1">Correo Institucional *</label>
+          <input type="email" id="student-email" placeholder="alumno@ucse.edu.ar" class="w-full bg-[#F4F6F9] dark:bg-[#01182E] text-slate-900 dark:text-white border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0080FB]">
+        </div>
+        <div>
+          <label for="student-comision" class="block text-xs font-bold text-[#01305B] dark:text-slate-200 mb-1">Carrera / Comisión</label>
+          <input type="text" id="student-comision" placeholder="Robótica / Informática - DASS" class="w-full bg-[#F4F6F9] dark:bg-[#01182E] text-slate-900 dark:text-white border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0080FB]">
+        </div>
+      </div>
+
+      <!-- Pestañas de Filtro por Parte del Examen -->
+      <div class="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 dark:border-[#154D80]">
+        <span class="text-xs font-bold text-slate-600 dark:text-slate-300">Navegación por Secciones del Examen:</span>
+        <div class="inline-flex flex-wrap items-center gap-2">
+          <button type="button" class="part-tab-btn active px-3.5 py-1.5 rounded-lg border border-[#B6C9DB] dark:border-[#1569AE] text-xs font-bold transition" data-part="all">
+            📋 Examen Completo (100 pts)
+          </button>
+          <button type="button" class="part-tab-btn px-3.5 py-1.5 rounded-lg border border-[#B6C9DB] dark:border-[#1569AE] text-xs font-bold transition" data-part="teoria">
+            📘 Parte I: Teoría TP1–TP5 (50 pts)
+          </button>
+          <button type="button" class="part-tab-btn px-3.5 py-1.5 rounded-lg border border-[#B6C9DB] dark:border-[#1569AE] text-xs font-bold transition" data-part="practica">
+            💻 Parte II: Práctica Prolog TP7 (50 pts)
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         PARTE I: EVALUACIÓN TEÓRICO-CONCEPTUAL (TP1 A TP5 — 50 PUNTOS)
+    ========================================================================== -->
+    <section id="section-parte-teorica" class="space-y-8">
+      <div class="p-5 rounded-xl bg-[#01305B] text-white border-l-8 border-[#FFED00] shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <span class="text-xs font-extrabold uppercase tracking-wider text-[#FFED00] block">Parte I del Examen • Unidades 1 a 5</span>
+          <h2 class="text-xl font-extrabold ucse-heading">Evaluación Teórico-Conceptual Integradora (TP1, TP2, TP3, TP4 y TP5)</h2>
+        </div>
+        <span class="px-4 py-1.5 rounded-lg bg-[#023967] border border-[#6EC1E4]/40 text-[#FFED00] text-xs font-extrabold shrink-0">
+          Subtotal Parte I: 50 Puntos (20 Ítems)
+        </span>
+      </div>
+
+      <!-- =====================================================================
+           EJERCICIO T1: INTRODUCCIÓN A LA IA, CICLO DE AGENTE Y MARCO PEAS
+      ====================================================================== -->
+      <article class="ucse-card p-6 md:p-8 bg-white dark:bg-[#023967]/90 border border-slate-200 dark:border-[#154D80] space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-[#154D80] pb-4">
+          <div>
+            <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold bg-[#01305B] text-[#FFED00] mb-1.5">
+              <span>📘 Unidad 1 • TP N° 1</span>
+            </div>
+            <h3 class="text-lg md:text-xl font-extrabold text-[#01305B] dark:text-white ucse-heading">Ejercicio T1: Introducción a la IA, Ciclo de Agente y Marco PEAS</h3>
+          </div>
+          <span class="px-3.5 py-1 rounded-full bg-[#1569AE]/10 dark:bg-[#6EC1E4]/15 text-[#01305B] dark:text-[#6EC1E4] border border-[#1569AE]/30 text-xs font-extrabold self-start sm:self-auto shrink-0">
+            10 Puntos (4 &times; 2,5 pts)
+          </span>
+        </div>
+
+        <p class="text-sm text-slate-600 dark:text-slate-200 leading-relaxed">
+          Analiza los fundamentos epistemológicos de la Inteligencia Artificial según Russell & Norvig, la arquitectura del ciclo sensorial-motor y la especificación formal del entorno de trabajo (PEAS).
+        </p>
+
+        <div class="space-y-3.5">
+          <!-- Ítem 1: item_paradigma_russell_norvig -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#1569AE] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#6EC1E4] text-sm block">1. Cuadrante de las 4 Dimensiones de Russell & Norvig:</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">¿Cuál es el enfoque adoptado como paradigma central moderno por estudiar agentes que maximizan el logro de objetivos?</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej1_teoria_tp1" data-key="item_paradigma_russell_norvig" aria-label="1. Cuadrante de las 4 Dimensiones de Russell &amp; Norvig:" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la respuesta técnica --</option>
+                <option value="pensar_como_humano_cognitivo">Pensar como un humano (Modelado Cognitivo e introspección psicológica)</option>
+                <option value="actuar_racionalmente_agentes">Actuar racionalmente (Enfoque de Agentes Racionales que maximizan el desempeño esperado)</option>
+                <option value="actuar_como_humano_turing">Actuar como un humano (Imitación conductual indistinguible mediante teleimpresora)</option>
+                <option value="pensar_racionalmente_silogismos">Pensar racionalmente (Leyes del pensamiento y silogismos aristotélicos puros)</option>
+              </select>
+            </div>
+          </div>
+          <!-- Ítem 2: item_funcion_vs_programa -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#1569AE] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#6EC1E4] text-sm block">2. Ciclo Sensorial-Motor y Arquitectura de Agentes:</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">Distinción formal entre la Función de Agente y el Programa de Agente:</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej1_teoria_tp1" data-key="item_funcion_vs_programa" aria-label="2. Ciclo Sensorial-Motor y Arquitectura de Agentes:" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la respuesta técnica --</option>
+                <option value="ambos_son_hardware_fisico">Ambos representan los actuadores electromecánicos que modifican el entorno</option>
+                <option value="funcion_codigo_programa_tabla">La Función es el código fuente en Python/Prolog y el Programa es la tabla matemática infinita</option>
+                <option value="funcion_mapeo_abstracto_programa_implementacion">La Función es la correspondencia matemática abstracta (f: P* → A) y el Programa es su implementación concreta ejecutada en una arquitectura</option>
+                <option value="funcion_solo_reactiva_programa_humano">La Función solo aplica a agentes sin sensores y el Programa únicamente a sistemas biológicos</option>
+              </select>
+            </div>
+          </div>
+          <!-- Ítem 3: item_peas_vehiculo_autonomo -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#1569AE] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#6EC1E4] text-sm block">3. Especificación PEAS (PAGE) de un Taxi Autónomo:</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">Dentro del marco PEAS, ¿a qué componente corresponden las cámaras estereoscópicas, el radar LiDAR, el GPS y el velocímetro?</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej1_teoria_tp1" data-key="item_peas_vehiculo_autonomo" aria-label="3. Especificación PEAS (PAGE) de un Taxi Autónomo:" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la respuesta técnica --</option>
+                <option value="medida_rendimiento_performance">Medida de Rendimiento (Performance): criterios de seguridad y confort del pasajero</option>
+                <option value="actuadores_ejecucion">Actuadores (Actuators): mecanismos de dirección, frenado y aceleración</option>
+                <option value="sensores_percepcion">Sensores (Sensors): dispositivos de captura de percepciones del entorno vial</option>
+                <option value="entorno_environment">Entorno (Environment): autopistas, peatones, clima y normas de tránsito</option>
+              </select>
+            </div>
+          </div>
+          <!-- Ítem 4: item_test_turing_total -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#1569AE] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#6EC1E4] text-sm block">4. Evaluación Empírica de la Inteligencia (Test de Turing vs. Test Total):</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">¿Qué dos disciplinas adicionales exige exclusivamente el Test de Turing Total frente al Test de Turing estándar por texto?</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej1_teoria_tp1" data-key="item_test_turing_total" aria-label="4. Evaluación Empírica de la Inteligencia (Test de Turing vs. Test Total):" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la respuesta técnica --</option>
+                <option value="pln_y_aprendizaje_automatico">Procesamiento del Lenguaje Natural (PLN) y Aprendizaje Automático (Machine Learning)</option>
+                <option value="vision_computacional_y_robotica">Visión Computacional (percibir objetos físicos) y Robótica (manipular objetos y desplazarse)</option>
+                <option value="representacion_conocimiento_y_razonamiento">Representación del Conocimiento y Razonamiento Automatizado</option>
+                <option value="compiladores_y_bases_relacionales">Diseño de Compiladores y Bases de Datos Relacionales SQL</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Orientación Bibliográfica Oficial -->
+        <details class="group mt-4 rounded-xl border border-[#1569AE]/30 bg-[#F4F6F9] dark:bg-[#01182E]/80 p-3.5 text-xs text-slate-700 dark:text-slate-200 transition-all">
+          <summary class="flex cursor-pointer items-center justify-between font-bold text-[#01305B] dark:text-[#FFED00] select-none">
+            <span>📖 Dónde estudiar y repasar este tema en la bibliografía oficial de cátedra</span>
+            <span class="transition group-open:rotate-180">▾</span>
+          </summary>
+          <div class="mt-2.5 pt-2.5 border-t border-slate-300 dark:border-[#154D80] space-y-1">
+            <p><strong>Referencia Bibliográfica:</strong> <a href="http://jdelagarza.fime.uanl.mx/IA/Libros/inteligencia-artificial-un-enfoque-moderno-stuart-j-russell.pdf" target="_blank" rel="noopener noreferrer" class="underline text-[#1569AE] dark:text-[#6EC1E4] hover:text-[#01305B] font-semibold">Russell &amp; Norvig — Inteligencia Artificial: Un Enfoque Moderno</a> &bull; Russell & Norvig Cap. 1.1 (pp. 1–5) y Cap. 2.1–2.3 (pp. 34–46) • Diapositivas Clase 1 (Slides 15–18) y Clase 3.1 (Slides 5–14).</p>
+          </div>
+        </details>
+      </article>
+      <!-- =====================================================================
+           EJERCICIO T2: FORMULACIÓN DE PROBLEMAS Y BÚSQUEDA NO INFORMADA (BFS VS. DFS)
+      ====================================================================== -->
+      <article class="ucse-card p-6 md:p-8 bg-white dark:bg-[#023967]/90 border border-slate-200 dark:border-[#154D80] space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-[#154D80] pb-4">
+          <div>
+            <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold bg-[#01305B] text-[#FFED00] mb-1.5">
+              <span>📘 Unidad 2 • TP N° 2</span>
+            </div>
+            <h3 class="text-lg md:text-xl font-extrabold text-[#01305B] dark:text-white ucse-heading">Ejercicio T2: Formulación de Problemas y Búsqueda No Informada (BFS vs. DFS)</h3>
+          </div>
+          <span class="px-3.5 py-1 rounded-full bg-[#1569AE]/10 dark:bg-[#6EC1E4]/15 text-[#01305B] dark:text-[#6EC1E4] border border-[#1569AE]/30 text-xs font-extrabold self-start sm:self-auto shrink-0">
+            10 Puntos (4 &times; 2,5 pts)
+          </span>
+        </div>
+
+        <p class="text-sm text-slate-600 dark:text-slate-200 leading-relaxed">
+          Evalúa la formulación canónica de problemas en espacios de estados, la estructura de datos del árbol de búsqueda y las propiedades asintóticas de las estrategias a ciegas Primero en Anchura (BFS) y Primero en Profundidad (DFS).
+        </p>
+
+        <div class="space-y-3.5">
+          <!-- Ítem 1: item_formulacion_costo_camino -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#1569AE] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#6EC1E4] text-sm block">1. Componentes Formales de un Problema de Búsqueda:</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">¿Cuál es el rol de la Función de Costo de Camino g(n) en la formulación de un problema como la ruta de Arad a Bucarest?</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej2_teoria_tp2" data-key="item_formulacion_costo_camino" aria-label="1. Componentes Formales de un Problema de Búsqueda:" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la respuesta técnica --</option>
+                <option value="estimar_distancia_recta_meta">Estimar heurísticamente la distancia en línea recta restante hasta Bucarest</option>
+                <option value="asignar_costo_acumulado_trayectoria">Asignar un valor numérico al camino sumando los costos de las acciones ejecutadas desde el estado inicial hasta n</option>
+                <option value="contar_cantidad_estados_totales">Calcular la cardinalidad total del espacio de estados alcanzables del problema</option>
+                <option value="verificar_si_es_estado_meta">Determinar booleanamente si el nodo actual satisface la condición de parada</option>
+              </select>
+            </div>
+          </div>
+          <!-- Ítem 2: item_diferencia_nodo_estado -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#1569AE] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#6EC1E4] text-sm block">2. Distinción Ontológica entre Estado del Mundo y Nodo de Búsqueda:</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">¿Qué información pertenece exclusivamente al Nodo de Búsqueda como estructura de datos del algoritmo y NO al Estado físico?</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej2_teoria_tp2" data-key="item_diferencia_nodo_estado" aria-label="2. Distinción Ontológica entre Estado del Mundo y Nodo de Búsqueda:" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la respuesta técnica --</option>
+                <option value="ubicacion_actual_agente">La configuración física o ciudad actual donde se encuentra el agente</option>
+                <option value="puntero_padre_accion_costo_profundidad">El puntero al nodo padre, la acción aplicada, el costo acumulado g(n) y la profundidad d en el árbol</option>
+                <option value="conjunto_ciudades_mapa">La topología completa de carreteras del mapa de Rumania</option>
+                <option value="heuristica_exacta_entorno">Las leyes físicas dinámicas del entorno de operación</option>
+              </select>
+            </div>
+          </div>
+          <!-- Ítem 3: item_bfs_cola_memoria -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#1569AE] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#6EC1E4] text-sm block">3. Búsqueda Primero en Anchura (BFS — Breadth-First Search):</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">Estructura de datos de la frontera en BFS y su principal limitación de complejidad espacial:</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej2_teoria_tp2" data-key="item_bfs_cola_memoria" aria-label="3. Búsqueda Primero en Anchura (BFS — Breadth-First Search):" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la respuesta técnica --</option>
+                <option value="pila_lifo_memoria_lineal">Pila LIFO (Last-In, First-Out) con complejidad espacial lineal O(b · m)</option>
+                <option value="cola_fifo_memoria_exponencial">Cola FIFO (First-In, First-Out) con complejidad espacial exponencial O(bᵈ) al retener todo el nivel en memoria</option>
+                <option value="cola_prioridad_heuristica">Cola de prioridad ordenada por h(n) con memoria constante O(1)</option>
+                <option value="arbol_binario_sin_memoria">Lista aleatoria sin almacenamiento de frontera en memoria RAM</option>
+              </select>
+            </div>
+          </div>
+          <!-- Ítem 4: item_dfs_ventaja_desventaja -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#1569AE] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#6EC1E4] text-sm block">4. Búsqueda Primero en Profundidad (DFS — Depth-First Search):</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">¿Cuál es la ventaja fundamental de DFS frente a BFS y cuál es su riesgo crítico en árboles con ramas infinitas?</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej2_teoria_tp2" data-key="item_dfs_ventaja_desventaja" aria-label="4. Búsqueda Primero en Profundidad (DFS — Depth-First Search):" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la respuesta técnica --</option>
+                <option value="garantiza_optimalidad_pero_lenta">Garantiza siempre hallar el camino más corto pero requiere memoria exponencial O(bᵈ)</option>
+                <option value="memoria_lineal_pero_incompleta_ciclos">Consume memoria lineal O(b · m), pero es no óptima e incompleta en árboles si existen bucles o ramas infinitas</option>
+                <option value="expande_por_niveles_uniformes">Expande estrictamente nivel por nivel garantizando optimalidad con costos variables</option>
+                <option value="usa_dos_fronteras_simultaneas">Ejecuta dos búsquedas simultáneas desde el inicio y la meta con costo O(b^(d/2))</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Orientación Bibliográfica Oficial -->
+        <details class="group mt-4 rounded-xl border border-[#1569AE]/30 bg-[#F4F6F9] dark:bg-[#01182E]/80 p-3.5 text-xs text-slate-700 dark:text-slate-200 transition-all">
+          <summary class="flex cursor-pointer items-center justify-between font-bold text-[#01305B] dark:text-[#FFED00] select-none">
+            <span>📖 Dónde estudiar y repasar este tema en la bibliografía oficial de cátedra</span>
+            <span class="transition group-open:rotate-180">▾</span>
+          </summary>
+          <div class="mt-2.5 pt-2.5 border-t border-slate-300 dark:border-[#154D80] space-y-1">
+            <p><strong>Referencia Bibliográfica:</strong> <a href="http://jdelagarza.fime.uanl.mx/IA/Libros/inteligencia-artificial-un-enfoque-moderno-stuart-j-russell.pdf" target="_blank" rel="noopener noreferrer" class="underline text-[#1569AE] dark:text-[#6EC1E4] hover:text-[#01305B] font-semibold">Russell &amp; Norvig — Inteligencia Artificial: Un Enfoque Moderno</a> &bull; Russell & Norvig Cap. 3.1–3.4 (pp. 64–87, Tabla 3.17) • Diapositivas Clase 3.2 (Slides 4–15, 37–58).</p>
+          </div>
+        </details>
+      </article>
+      <!-- =====================================================================
+           EJERCICIO T3: BÚSQUEDA INFORMADA, TRAMPAS DE VORAZ Y ALGORITMO A*
+      ====================================================================== -->
+      <article class="ucse-card p-6 md:p-8 bg-white dark:bg-[#023967]/90 border border-slate-200 dark:border-[#154D80] space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-[#154D80] pb-4">
+          <div>
+            <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold bg-[#01305B] text-[#FFED00] mb-1.5">
+              <span>📘 Unidad 3 • TP N° 3</span>
+            </div>
+            <h3 class="text-lg md:text-xl font-extrabold text-[#01305B] dark:text-white ucse-heading">Ejercicio T3: Búsqueda Informada, Trampas de Voraz y Algoritmo A*</h3>
+          </div>
+          <span class="px-3.5 py-1 rounded-full bg-[#1569AE]/10 dark:bg-[#6EC1E4]/15 text-[#01305B] dark:text-[#6EC1E4] border border-[#1569AE]/30 text-xs font-extrabold self-start sm:self-auto shrink-0">
+            10 Puntos (4 &times; 2,5 pts)
+          </span>
+        </div>
+
+        <p class="text-sm text-slate-600 dark:text-slate-200 leading-relaxed">
+          Analiza el uso de conocimiento heurístico h(n), el comportamiento miope de la Búsqueda Voraz Primero el Mejor y las propiedades formales de evaluación y admisibilidad del algoritmo A*.
+        </p>
+
+        <div class="space-y-3.5">
+          <!-- Ítem 1: item_voraz_funcion_trampa -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#1569AE] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#6EC1E4] text-sm block">1. Búsqueda Voraz Primero el Mejor (Greedy Best-First Search):</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">¿Qué función de evaluación utiliza y qué fenómeno ilustra el contraejemplo de ir de Iasi a Fagaras en Rumania?</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej3_teoria_tp3" data-key="item_voraz_funcion_trampa" aria-label="1. Búsqueda Voraz Primero el Mejor (Greedy Best-First Search):" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la respuesta técnica --</option>
+                <option value="usa_g_mas_h_optima">Usa f(n) = g(n) + h(n), garantizando el camino óptimo sin expandir nodos innecesarios</option>
+                <option value="usa_solo_h_callejon_neamt">Usa f(n) = h(n); su miopía local elige Neamt por menor distancia en línea recta, metiéndose en un callejón sin salida</option>
+                <option value="usa_solo_g_dijkstra">Usa f(n) = g(n), ignorando la heurística y comportándose como Búsqueda de Costo Uniforme</option>
+                <option value="usa_corte_iterativo_lineal">Usa f_limit recursivo evitando cualquier ciclo incluso sin lista de explorados</option>
+              </select>
+            </div>
+          </div>
+          <!-- Ítem 2: item_a_star_significado_f -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#1569AE] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#6EC1E4] text-sm block">2. Función de Evaluación Canónica del Algoritmo A*:</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">¿Cómo se define f(n) en A* y cuál es su interpretación semántica exacta?</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej3_teoria_tp3" data-key="item_a_star_significado_f" aria-label="2. Función de Evaluación Canónica del Algoritmo A*:" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la respuesta técnica --</option>
+                <option value="f_igual_g_menos_h">f(n) = g(n) − h(n): diferencia neta entre el costo pasado y el futuro</option>
+                <option value="f_igual_g_mas_h_costo_estimado_total">f(n) = g(n) + h(n): costo total estimado de la solución más barata que pasa a través del nodo n</option>
+                <option value="f_igual_h_al_cuadrado">f(n) = [h(n)]²: penalización cuadrática de la distancia heurística hacia el objetivo</option>
+                <option value="f_igual_profundidad_por_ramificacion">f(n) = b · d: producto del factor de ramificación por la profundidad actual</option>
+              </select>
+            </div>
+          </div>
+          <!-- Ítem 3: item_a_star_momento_test_meta -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#1569AE] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#6EC1E4] text-sm block">3. Condición Operativa de Parada en A* y UCS:</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">¿En qué instante exacto debe ejecutarse el test objetivo en A* para no retornar una ruta subóptima (como Bucarest f=450 vía Fagaras antes de Pitesti f=417)?</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej3_teoria_tp3" data-key="item_a_star_momento_test_meta" aria-label="3. Condición Operativa de Parada en A* y UCS:" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la respuesta técnica --</option>
+                <option value="al_generar_sucesor_inmediatamente">En el instante mismo en que un nodo meta es generado como hijo de cualquier nodo</option>
+                <option value="al_extraer_nodo_de_frontera_para_expansion">Únicamente cuando el nodo es extraído de la cola de prioridad para ser expandido (teniendo el menor valor f de toda la frontera)</option>
+                <option value="antes_de_calcular_heuristica">Antes de calcular g(n) y h(n), al inicializar el estado raíz</option>
+                <option value="al_vaciar_completamente_frontera">Solo después de que la cola de prioridad quede completamente vacía</option>
+              </select>
+            </div>
+          </div>
+          <!-- Ítem 4: item_definicion_heuristica_admisible -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#1569AE] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#6EC1E4] text-sm block">4. Condición de Optimalidad de A* en Búsqueda en Árboles:</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">¿Qué propiedad matemática debe cumplir h(n) para ser una heurística admisible?</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej3_teoria_tp3" data-key="item_definicion_heuristica_admisible" aria-label="4. Condición de Optimalidad de A* en Búsqueda en Árboles:" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la respuesta técnica --</option>
+                <option value="sobrestimar_costo_real">Sobrestimar siempre el costo real h*(n) para podar ramas rápidamente (h(n) &gt; h*(n))</option>
+                <option value="nunca_sobrestimar_costo_real_optimo">Nunca sobrestimar el costo real para alcanzar el objetivo: 0 ≤ h(n) ≤ h*(n) para todo nodo n, y h(meta) = 0</option>
+                <option value="ser_constante_infinita">Tomar un valor constante igual a infinito en todos los nodos intermedios</option>
+                <option value="depender_solo_del_nodo_padre">Ser estrictamente igual al costo acumulado g(n) del nodo padre</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Orientación Bibliográfica Oficial -->
+        <details class="group mt-4 rounded-xl border border-[#1569AE]/30 bg-[#F4F6F9] dark:bg-[#01182E]/80 p-3.5 text-xs text-slate-700 dark:text-slate-200 transition-all">
+          <summary class="flex cursor-pointer items-center justify-between font-bold text-[#01305B] dark:text-[#FFED00] select-none">
+            <span>📖 Dónde estudiar y repasar este tema en la bibliografía oficial de cátedra</span>
+            <span class="transition group-open:rotate-180">▾</span>
+          </summary>
+          <div class="mt-2.5 pt-2.5 border-t border-slate-300 dark:border-[#154D80] space-y-1">
+            <p><strong>Referencia Bibliográfica:</strong> <a href="http://jdelagarza.fime.uanl.mx/IA/Libros/inteligencia-artificial-un-enfoque-moderno-stuart-j-russell.pdf" target="_blank" rel="noopener noreferrer" class="underline text-[#1569AE] dark:text-[#6EC1E4] hover:text-[#01305B] font-semibold">Russell &amp; Norvig — Inteligencia Artificial: Un Enfoque Moderno</a> &bull; Russell & Norvig Cap. 4.1.1–4.1.3 (pp. 98–110) • Diapositivas Clase 4 (Slides 1–23).</p>
+          </div>
+        </details>
+      </article>
+      <!-- =====================================================================
+           EJERCICIO T4: AGENTES BASADOS EN CONOCIMIENTO Y LÓGICA PROPOSICIONAL
+      ====================================================================== -->
+      <article class="ucse-card p-6 md:p-8 bg-white dark:bg-[#023967]/90 border border-slate-200 dark:border-[#154D80] space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-[#154D80] pb-4">
+          <div>
+            <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold bg-[#01305B] text-[#FFED00] mb-1.5">
+              <span>📘 Unidad 4 • TP N° 4</span>
+            </div>
+            <h3 class="text-lg md:text-xl font-extrabold text-[#01305B] dark:text-white ucse-heading">Ejercicio T4: Agentes Basados en Conocimiento y Lógica Proposicional</h3>
+          </div>
+          <span class="px-3.5 py-1 rounded-full bg-[#1569AE]/10 dark:bg-[#6EC1E4]/15 text-[#01305B] dark:text-[#6EC1E4] border border-[#1569AE]/30 text-xs font-extrabold self-start sm:self-auto shrink-0">
+            10 Puntos (4 &times; 2,5 pts)
+          </span>
+        </div>
+
+        <p class="text-sm text-slate-600 dark:text-slate-200 leading-relaxed">
+          Evalúa la arquitectura de agentes basados en conocimiento (KB), la relación entre sintaxis, semántica y robustez (soundness), y la clasificación semántica de sentencias en lógica proposicional.
+        </p>
+
+        <div class="space-y-3.5">
+          <!-- Ítem 1: item_arquitectura_agente_kb -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#1569AE] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#6EC1E4] text-sm block">1. Arquitectura de un Agente Basado en Conocimiento:</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">¿Cuáles son los dos componentes nucleares que distinguen a un agente basado en conocimiento de un agente reactivo simple?</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej4_teoria_tp4" data-key="item_arquitectura_agente_kb" aria-label="1. Arquitectura de un Agente Basado en Conocimiento:" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la respuesta técnica --</option>
+                <option value="tabla_hash_y_generador_aleatorio">Una tabla hash estática de reflejos y un generador de acciones pseudoaleatorias</option>
+                <option value="base_conocimiento_y_motor_inferencia">Una Base de Conocimiento (KB) con sentencias sobre el mundo y un Motor de Inferencia que deriva nuevas conclusiones mediante TELL y ASK</option>
+                <option value="red_sensores_sin_representacion">Un conjunto de actuadores directos sin representación interna ni memoria</option>
+                <option value="heuristica_manhattan_y_pila_lifo">Una función heurística euclidiana acoplada a una pila LIFO sin reglas lógicas</option>
+              </select>
+            </div>
+          </div>
+          <!-- Ítem 2: item_sintaxis_vs_semantica -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#1569AE] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#6EC1E4] text-sm block">2. Lenguajes de Representación del Conocimiento:</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">Diferencia formal entre Sintaxis y Semántica en un lenguaje lógico:</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej4_teoria_tp4" data-key="item_sintaxis_vs_semantica" aria-label="2. Lenguajes de Representación del Conocimiento:" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la respuesta técnica --</option>
+                <option value="sintaxis_verdad_semantica_caligrafia">La sintaxis determina el valor de verdad en el mundo real y la semántica el tamaño de las fuentes</option>
+                <option value="sintaxis_forma_simbolos_semantica_verdad_modelos">La sintaxis especifica qué configuraciones de símbolos son sentencias bien formadas, y la semántica determina el significado y verdad de cada sentencia respecto a cada modelo posible</option>
+                <option value="ambas_son_sinonimos_exactos">Ambas son sinónimos que refieren exclusivamente a la velocidad de ejecución del compilador</option>
+                <option value="semantica_solo_aplica_a_numeros">La sintaxis aplica a la lógica proposicional y la semántica únicamente a ecuaciones diferenciales</option>
+              </select>
+            </div>
+          </div>
+          <!-- Ítem 3: item_propiedad_robustez_soundness -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#1569AE] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#6EC1E4] text-sm block">3. Propiedades de los Algoritmos de Inferencia (Robustez / Corrección):</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">¿Qué significa que un algoritmo de inferencia sea Robusto o Correcto (Sound)?</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej4_teoria_tp4" data-key="item_propiedad_robustez_soundness" aria-label="3. Propiedades de los Algoritmos de Inferencia (Robustez / Corrección):" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la respuesta técnica --</option>
+                <option value="deriva_cualquier_sentencia_falsa_rapido">Que puede derivar cualquier sentencia arbitraria en tiempo constante O(1) aunque sea falsa</option>
+                <option value="solo_deriva_sentencias_implicadas_logicamente">Que preserva la verdad: toda sentencia α derivada por el algoritmo (KB ⊢ α) es también una consecuencia lógica verdadera en todos los modelos de la KB (KB ⊨ α)</option>
+                <option value="ignora_la_base_de_conocimiento">Que opera sin consultar las premisas almacenadas en la Base de Conocimiento</option>
+                <option value="requiere_infinitos_modelos_abiertos">Que solo funciona cuando las variables proposicionales tienen tres valores de verdad</option>
+              </select>
+            </div>
+          </div>
+          <!-- Ítem 4: item_clasificacion_sentencia_valida -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#1569AE] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#6EC1E4] text-sm block">4. Clasificación Semántica de Sentencias Proposicionales:</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">¿Cómo se clasifica una sentencia como (P ⇒ Q) ⇔ (¬Q ⇒ ¬P) o (P ∨ ¬P) que resulta verdadera en absolutamente todos los modelos posibles?</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej4_teoria_tp4" data-key="item_clasificacion_sentencia_valida" aria-label="4. Clasificación Semántica de Sentencias Proposicionales:" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la respuesta técnica --</option>
+                <option value="insatisfacible_contradiccion">Insatisfacible (Contradicción): falsa en todas las interpretaciones posibles</option>
+                <option value="contingente_empirica">Contingente: verdadera en algunos modelos y falsa en otros según el estado del mundo</option>
+                <option value="valida_tautologia">Válida (Tautología): verdadera en todos los modelos posibles para cualquier asignación de verdad</option>
+                <option value="indecidible_proposicional">Indecidible: imposible de evaluar mediante tablas de verdad finitas</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Orientación Bibliográfica Oficial -->
+        <details class="group mt-4 rounded-xl border border-[#1569AE]/30 bg-[#F4F6F9] dark:bg-[#01182E]/80 p-3.5 text-xs text-slate-700 dark:text-slate-200 transition-all">
+          <summary class="flex cursor-pointer items-center justify-between font-bold text-[#01305B] dark:text-[#FFED00] select-none">
+            <span>📖 Dónde estudiar y repasar este tema en la bibliografía oficial de cátedra</span>
+            <span class="transition group-open:rotate-180">▾</span>
+          </summary>
+          <div class="mt-2.5 pt-2.5 border-t border-slate-300 dark:border-[#154D80] space-y-1">
+            <p><strong>Referencia Bibliográfica:</strong> <a href="http://jdelagarza.fime.uanl.mx/IA/Libros/inteligencia-artificial-un-enfoque-moderno-stuart-j-russell.pdf" target="_blank" rel="noopener noreferrer" class="underline text-[#1569AE] dark:text-[#6EC1E4] hover:text-[#01305B] font-semibold">Russell &amp; Norvig — Inteligencia Artificial: Un Enfoque Moderno</a> &bull; Russell & Norvig Cap. 7.1–7.5 (pp. 194–215) • Diapositivas Clase 5 (`5 - Conocimiento y Razonamiento.pptx`).</p>
+          </div>
+        </details>
+      </article>
+      <!-- =====================================================================
+           EJERCICIO T5: LÓGICA DE PRIMER ORDEN (LPO) Y CUANTIFICACIÓN FORMAL
+      ====================================================================== -->
+      <article class="ucse-card p-6 md:p-8 bg-white dark:bg-[#023967]/90 border border-slate-200 dark:border-[#154D80] space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-[#154D80] pb-4">
+          <div>
+            <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold bg-[#01305B] text-[#FFED00] mb-1.5">
+              <span>📘 Unidad 5 • TP N° 5</span>
+            </div>
+            <h3 class="text-lg md:text-xl font-extrabold text-[#01305B] dark:text-white ucse-heading">Ejercicio T5: Lógica de Primer Orden (LPO) y Cuantificación Formal</h3>
+          </div>
+          <span class="px-3.5 py-1 rounded-full bg-[#1569AE]/10 dark:bg-[#6EC1E4]/15 text-[#01305B] dark:text-[#6EC1E4] border border-[#1569AE]/30 text-xs font-extrabold self-start sm:self-auto shrink-0">
+            10 Puntos (4 &times; 2,5 pts)
+          </span>
+        </div>
+
+        <p class="text-sm text-slate-600 dark:text-slate-200 leading-relaxed">
+          Evalúa el compromiso ontológico de la Lógica de Primer Orden frente a la Lógica Proposicional, la clasificación de elementos sintácticos (términos vs. sentencias) y las reglas canónicas de cuantificación universal y existencial.
+        </p>
+
+        <div class="space-y-3.5">
+          <!-- Ítem 1: item_compromiso_ontologico_lpo -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#1569AE] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#6EC1E4] text-sm block">1. Compromiso Ontológico de la Lógica de Primer Orden (LPO):</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">A diferencia de la Lógica Proposicional (que solo asume hechos atómicos V/F), ¿qué elementos presupone la LPO que existen en el mundo?</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej5_teoria_tp5" data-key="item_compromiso_ontologico_lpo" aria-label="1. Compromiso Ontológico de la Lógica de Primer Orden (LPO):" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la respuesta técnica --</option>
+                <option value="solo_variables_booleanas_sin_estructura">Únicamente letras proposicionales indivisibles sin estructura interna</option>
+                <option value="objetos_relaciones_y_funciones">Objetos individuales del dominio, relaciones (propiedades/predicados sobre tuplas) y funciones (mapeos de objetos a un único objeto)</option>
+                <option value="probabilidades_difusas_continuas">Distribuciones de probabilidad continuas sin objetos discretos</option>
+                <option value="exclusivamente_numeros_enteros">Únicamente constantes numéricas enteras y operadores aritméticos</option>
+              </select>
+            </div>
+          </div>
+          <!-- Ítem 2: item_clasificacion_sintaxis_funcion -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#1569AE] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#6EC1E4] text-sm block">2. Sintaxis Formal de LPO (Términos vs. Sentencias Atómicas):</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">En la expresión Rey(PadreDe(Juan)), ¿qué categoría sintáctica tiene PadreDe(Juan) frente a Rey(PadreDe(Juan))?</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej5_teoria_tp5" data-key="item_clasificacion_sintaxis_funcion" aria-label="2. Sintaxis Formal de LPO (Términos vs. Sentencias Atómicas):" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la respuesta técnica --</option>
+                <option value="ambos_son_conectivos_logicos">Ambos son conectivos lógicos binarios equivalentes a la implicación</option>
+                <option value="termino_objeto_vs_sentencia_atomica_verdad">PadreDe(Juan) es un término complejo (función que referencia a un objeto) y Rey(PadreDe(Juan)) es una sentencia atómica con valor de verdad</option>
+                <option value="variable_libre_vs_constante">PadreDe(Juan) es una sentencia compuesta y Rey es una variable cuantificada</option>
+                <option value="cuantificador_existencial_skolem">Ambos son axiomas proposicionales sin argumentos</option>
+              </select>
+            </div>
+          </div>
+          <!-- Ítem 3: item_cuantificador_universal_conector -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#1569AE] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#6EC1E4] text-sm block">3. Cuantificación Universal Canónica (∀):</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">Para formalizar "Todos los robots soldadores operan en alta tensión", ¿qué conectivo debe acompañar a ∀x y por qué es un error grave usar ∧?</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej5_teoria_tp5" data-key="item_cuantificador_universal_conector" aria-label="3. Cuantificación Universal Canónica (∀):" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la respuesta técnica --</option>
+                <option value="usar_conjuncion_porque_restringe">Debe usarse ∧: ∀x (RobotSoldador(x) ∧ AltaTension(x)), porque restringe el dominio solo a los robots</option>
+                <option value="usar_implicacion_evita_afirmar_todo_universo">Debe usarse ⇒: ∀x (RobotSoldador(x) ⇒ AltaTension(x)); usar ∧ afirmaría erróneamente que todos los objetos del universo son robots soldadores y operan en alta tensión</option>
+                <option value="usar_disyuncion_exclusiva">Debe usarse ⊕ (XOR) para excluir a los robots de ensamblaje</option>
+                <option value="no_requiere_conectivo_logico">No se permite usar conectivos lógicos dentro del alcance de ∀x</option>
+              </select>
+            </div>
+          </div>
+          <!-- Ítem 4: item_cuantificador_existencial_conector -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#1569AE] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#6EC1E4] text-sm block">4. Cuantificación Existencial Canónica (∃):</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">Para formalizar "Existe al menos un alumno en la UCSE que programa en Prolog", ¿cuál es la formulación correcta y qué ocurre si se usa ⇒?</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej5_teoria_tp5" data-key="item_cuantificador_existencial_conector" aria-label="4. Cuantificación Existencial Canónica (∃):" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la respuesta técnica --</option>
+                <option value="existencial_con_implicacion">∃x (AlumnoUCSE(x) ⇒ ProgramaProlog(x)), porque ⇒ vincula sujeto y predicado existencial</option>
+                <option value="existencial_con_conjuncion_evita_trivialidad">∃x (AlumnoUCSE(x) ∧ ProgramaProlog(x)); si se usara ⇒, la sentencia sería trivialmente verdadera ante cualquier objeto del universo que no sea alumno de la UCSE</option>
+                <option value="universal_negado_con_implicacion">∀x (AlumnoUCSE(x) ∧ ¬ProgramaProlog(x))</option>
+                <option value="existencial_con_bicondicional">∃x (AlumnoUCSE(x) ⇔ ProgramaProlog(x))</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Orientación Bibliográfica Oficial -->
+        <details class="group mt-4 rounded-xl border border-[#1569AE]/30 bg-[#F4F6F9] dark:bg-[#01182E]/80 p-3.5 text-xs text-slate-700 dark:text-slate-200 transition-all">
+          <summary class="flex cursor-pointer items-center justify-between font-bold text-[#01305B] dark:text-[#FFED00] select-none">
+            <span>📖 Dónde estudiar y repasar este tema en la bibliografía oficial de cátedra</span>
+            <span class="transition group-open:rotate-180">▾</span>
+          </summary>
+          <div class="mt-2.5 pt-2.5 border-t border-slate-300 dark:border-[#154D80] space-y-1">
+            <p><strong>Referencia Bibliográfica:</strong> <a href="http://jdelagarza.fime.uanl.mx/IA/Libros/inteligencia-artificial-un-enfoque-moderno-stuart-j-russell.pdf" target="_blank" rel="noopener noreferrer" class="underline text-[#1569AE] dark:text-[#6EC1E4] hover:text-[#01305B] font-semibold">Russell &amp; Norvig — Inteligencia Artificial: Un Enfoque Moderno</a> &bull; Russell & Norvig Cap. 8.1–8.3 (pp. 240–258) • Diapositivas Clase 6 (`6 - Lógica de Primer Orden.pptx`, Slides 2–11).</p>
+          </div>
+        </details>
+      </article>
+    </section>
+
+    <!-- =========================================================================
+         PARTE II: EVALUACIÓN PRÁCTICA EN PROLOG (ESTILO TP7 — 50 PUNTOS)
+    ========================================================================== -->
+    <section id="section-parte-practica" class="space-y-8">
+      <div class="p-5 rounded-xl bg-[#01305B] text-white border-l-8 border-[#0080FB] shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <span class="text-xs font-extrabold uppercase tracking-wider text-[#6EC1E4] block">Parte II del Examen • Programación Lógica Declarativa</span>
+          <h2 class="text-xl font-extrabold ucse-heading">Modelado de Base de Conocimientos y Consultas en SWI-Prolog (Modalidad TP7)</h2>
+        </div>
+        <span class="px-4 py-1.5 rounded-lg bg-[#FFED00] text-[#01305B] text-xs font-extrabold shrink-0">
+          Subtotal Parte II: 50 Puntos (26p KB + 24p Consultas)
+        </span>
+      </div>
+
+      <!-- =====================================================================
+           EJERCICIO P1: GUARDIA Y TRIAJE DEL HOSPITAL UNIVERSITARIO (PROLOG)
+      ====================================================================== -->
+      <article class="ucse-card-gold p-6 md:p-8 bg-white dark:bg-[#023967]/90 border border-slate-200 dark:border-[#154D80] space-y-6">
+        <!-- Cabecera del Caso Práctico -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-[#154D80] pb-4">
+          <div>
+            <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-extrabold bg-[#FFED00] text-[#01305B] border border-[#01305B]/20 mb-1.5">
+              <span>💻 Caso Práctico 1 • 25 Puntos (13 pts KB + 12 pts Consultas)</span>
+            </div>
+            <h3 class="text-lg md:text-xl font-extrabold text-[#01305B] dark:text-white ucse-heading">Ejercicio P1: Guardia y Triaje del Hospital Universitario (Prolog)</h3>
+          </div>
+          <span class="px-3.5 py-1 rounded-full bg-[#01305B] text-[#FFED00] text-xs font-extrabold self-start sm:self-auto shrink-0">
+            25 Puntos Totales
+          </span>
+        </div>
+
+        <!-- Enunciado y Tarjetas de Especificación del Dominio -->
+        <div class="space-y-4 text-sm text-slate-700 dark:text-slate-200 leading-relaxed">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <p class="max-w-3xl">Estás desarrollando el módulo declarativo de asignación de guardias para el Hospital Universitario. A partir de las fichas técnicas de los 3 profesionales médicos que se muestran abajo, debes codificar los 9 hechos de la base de conocimientos y las 2 reglas deductivas solicitadas:</p>
+            <div class="inline-flex flex-wrap items-center gap-1.5 p-1.5 rounded-xl bg-slate-100 dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] text-xs shrink-0">
+              <button type="button" class="filter-btn filter-d1-btn px-3 py-1.5 rounded-lg active transition text-slate-700 dark:text-slate-200 font-medium" data-filter="all">🏥 Todos los Médicos</button>
+              <button type="button" class="filter-btn filter-d1-btn px-3 py-1.5 rounded-lg  transition text-slate-700 dark:text-slate-200 font-medium" data-filter="alta">🔴 Complejidad Alta</button>
+              <button type="button" class="filter-btn filter-d1-btn px-3 py-1.5 rounded-lg  transition text-slate-700 dark:text-slate-200 font-medium" data-filter="media">🟡 Complejidad Media</button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+            <div class="domain1-card p-5 rounded-xl bg-[#F4F6F9] dark:bg-[#012243] border border-slate-200 dark:border-[#154D80] hover:border-[#0080FB] transition-all duration-300 shadow-sm space-y-3.5" data-category="alta">
+              <div class="flex items-center justify-between gap-2">
+                <span class="font-bold text-[#01305B] dark:text-white text-sm">👩‍⚕️ Médica 1: Dra. Sosa</span>
+                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/30">
+                  🔴 Complejidad: alta
+                </span>
+              </div>
+              <div class="space-y-1.5">
+                <span class="text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider block font-bold">Datos Técnicos a Modelar en Prolog:</span>
+                <div class="flex flex-col gap-1.5">
+                  <span class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] text-xs text-[#01305B] dark:text-slate-100 flex items-center gap-1.5">
+                    <span aria-hidden="true">🆔</span> <span>Átomo médico: dra_sosa</span>
+                  </span>
+                  <span class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] text-xs text-[#01305B] dark:text-slate-100 flex items-center gap-1.5">
+                    <span aria-hidden="true">🫀</span> <span>Especialidad: cardiologia (complejidad: alta)</span>
+                  </span>
+                  <span class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] text-xs text-[#01305B] dark:text-slate-100 flex items-center gap-1.5">
+                    <span aria-hidden="true">🌅</span> <span>Franja de turno: manana</span>
+                  </span>
+                </div>
+              </div>
+              <div class="pt-2 border-t border-slate-200 dark:border-[#154D80] flex items-center justify-between text-xs text-slate-600 dark:text-slate-300 font-medium">
+                <span>Servicio: Cardiología</span>
+                <span class="text-[#1569AE] dark:text-[#FFED00] font-bold">Turno: manana</span>
+              </div>
+            </div>
+            <div class="domain1-card p-5 rounded-xl bg-[#F4F6F9] dark:bg-[#012243] border border-slate-200 dark:border-[#154D80] hover:border-[#0080FB] transition-all duration-300 shadow-sm space-y-3.5" data-category="alta">
+              <div class="flex items-center justify-between gap-2">
+                <span class="font-bold text-[#01305B] dark:text-white text-sm">👨‍⚕️ Médico 2: Dr. Paz</span>
+                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/30">
+                  🔴 Complejidad: alta
+                </span>
+              </div>
+              <div class="space-y-1.5">
+                <span class="text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider block font-bold">Datos Técnicos a Modelar en Prolog:</span>
+                <div class="flex flex-col gap-1.5">
+                  <span class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] text-xs text-[#01305B] dark:text-slate-100 flex items-center gap-1.5">
+                    <span aria-hidden="true">🆔</span> <span>Átomo médico: dr_paz</span>
+                  </span>
+                  <span class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] text-xs text-[#01305B] dark:text-slate-100 flex items-center gap-1.5">
+                    <span aria-hidden="true">🦴</span> <span>Especialidad: traumatologia (complejidad: alta)</span>
+                  </span>
+                  <span class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] text-xs text-[#01305B] dark:text-slate-100 flex items-center gap-1.5">
+                    <span aria-hidden="true">🌙</span> <span>Franja de turno: noche</span>
+                  </span>
+                </div>
+              </div>
+              <div class="pt-2 border-t border-slate-200 dark:border-[#154D80] flex items-center justify-between text-xs text-slate-600 dark:text-slate-300 font-medium">
+                <span>Servicio: Traumatología</span>
+                <span class="text-[#1569AE] dark:text-[#FFED00] font-bold">Turno: noche</span>
+              </div>
+            </div>
+            <div class="domain1-card p-5 rounded-xl bg-[#F4F6F9] dark:bg-[#012243] border border-slate-200 dark:border-[#154D80] hover:border-[#0080FB] transition-all duration-300 shadow-sm space-y-3.5" data-category="media">
+              <div class="flex items-center justify-between gap-2">
+                <span class="font-bold text-[#01305B] dark:text-white text-sm">👩‍⚕️ Médica 3: Dra. Luna</span>
+                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30">
+                  🟡 Complejidad: media
+                </span>
+              </div>
+              <div class="space-y-1.5">
+                <span class="text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider block font-bold">Datos Técnicos a Modelar en Prolog:</span>
+                <div class="flex flex-col gap-1.5">
+                  <span class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] text-xs text-[#01305B] dark:text-slate-100 flex items-center gap-1.5">
+                    <span aria-hidden="true">🆔</span> <span>Átomo médico: dra_luna</span>
+                  </span>
+                  <span class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] text-xs text-[#01305B] dark:text-slate-100 flex items-center gap-1.5">
+                    <span aria-hidden="true">🧸</span> <span>Especialidad: pediatria (complejidad: media)</span>
+                  </span>
+                  <span class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] text-xs text-[#01305B] dark:text-slate-100 flex items-center gap-1.5">
+                    <span aria-hidden="true">🌅</span> <span>Franja de turno: manana</span>
+                  </span>
+                </div>
+              </div>
+              <div class="pt-2 border-t border-slate-200 dark:border-[#154D80] flex items-center justify-between text-xs text-slate-600 dark:text-slate-300 font-medium">
+                <span>Servicio: Pediatría</span>
+                <span class="text-[#1569AE] dark:text-[#FFED00] font-bold">Turno: manana</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabla de Especificación de Predicados y Reglas a Codificar -->
+          <div class="p-4 rounded-xl bg-[#F4F6F9] dark:bg-[#012243] border border-[#B6C9DB] dark:border-[#1569AE] space-y-2.5">
+            <h4 class="text-xs font-extrabold uppercase tracking-wider text-[#01305B] dark:text-[#FFED00]">
+              📐 Especificación de Predicados y Reglas a Codificar en tu Base de Conocimientos (13 Puntos):
+            </h4>
+            <div class="space-y-1.5">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-[#1569AE]/15 text-[#01305B] dark:text-[#6EC1E4] shrink-0">Hechos (3 × 1 pt)</span>
+                  <code class="text-xs font-bold prolog-code text-[#01305B] dark:text-[#FFED00]">atiende(Medico, Especialidad)</code>
+                </div>
+                <span class="text-xs text-slate-600 dark:text-slate-300">Hecho binario (/2): relaciona cada médico con la especialidad que atiende.</span>
+              </div>
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-[#1569AE]/15 text-[#01305B] dark:text-[#6EC1E4] shrink-0">Hechos (3 × 1 pt)</span>
+                  <code class="text-xs font-bold prolog-code text-[#01305B] dark:text-[#FFED00]">turno(Medico, FranjaHoraria)</code>
+                </div>
+                <span class="text-xs text-slate-600 dark:text-slate-300">Hecho binario (/2): indica la franja horaria ('manana' o 'noche') del médico.</span>
+              </div>
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-[#1569AE]/15 text-[#01305B] dark:text-[#6EC1E4] shrink-0">Hechos (3 × 1 pt)</span>
+                  <code class="text-xs font-bold prolog-code text-[#01305B] dark:text-[#FFED00]">complejidad(Especialidad, Nivel)</code>
+                </div>
+                <span class="text-xs text-slate-600 dark:text-slate-300">Hecho binario (/2): define el nivel de complejidad ('alta' o 'media') de cada especialidad.</span>
+              </div>
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-[#FFED00] text-[#01305B] shrink-0">Regla (2 pts)</span>
+                  <code class="text-xs font-bold prolog-code text-[#01305B] dark:text-[#FFED00]">guardia_critica(Medico)</code>
+                </div>
+                <span class="text-xs text-slate-600 dark:text-slate-300">Regla deductiva (/1): verdadero si el Medico atiende una Especialidad cuya complejidad es 'alta'.</span>
+              </div>
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-[#FFED00] text-[#01305B] shrink-0">Regla (2 pts)</span>
+                  <code class="text-xs font-bold prolog-code text-[#01305B] dark:text-[#FFED00]">especialista_manana(Medico, Especialidad)</code>
+                </div>
+                <span class="text-xs text-slate-600 dark:text-slate-300">Regla deductiva (/2): verdadero si el Medico atiende la Especialidad y su turno es 'manana'.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN A (13 PUNTOS): EDITOR DE ENTREGA DE BASE DE CONOCIMIENTOS + LINTER EN VIVO -->
+        <div class="p-5 rounded-2xl bg-[#01182E] text-slate-100 border-2 border-[#0080FB] space-y-4">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-[#1569AE]/50 pb-3">
+            <div>
+              <span class="px-2.5 py-0.5 rounded bg-[#FFED00] text-[#01305B] text-[11px] font-extrabold uppercase">Sección A • 13 Puntos (9 Hechos + 2 Reglas)</span>
+              <h4 class="text-sm font-extrabold text-white mt-1 ucse-heading">
+                ✍️ Editor de Entrega de Base de Conocimientos (<code>caso1_hospital.pl</code>)
+              </h4>
+              <p class="text-xs text-slate-300">
+                Escribe aquí tu código Prolog completo (o prográmalo abajo en SWISH y pégalo aquí). Se guarda automáticamente en el JSON de entrega y se evalúa con normalización canónica (&alpha;-equivalencia).
+              </p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 shrink-0">
+              <button type="button" id="btn-copy-prolog-1" class="text-xs px-3 py-1.5 rounded-lg bg-[#FFED00] hover:bg-[#FDD247] text-[#01305B] font-extrabold transition shadow flex items-center gap-1.5">
+                <span>📋</span> Copiar KB para SWISH
+              </button>
+              <button type="button" id="btn-load-pl-1" class="text-xs px-3 py-1.5 rounded-lg bg-[#023967] hover:bg-[#1569AE] text-white border border-[#6EC1E4]/40 font-bold transition flex items-center gap-1.5">
+                <span>📂</span> Cargar .pl
+              </button>
+              <input type="file" id="input-load-pl-1" accept=".pl,.txt" class="hidden">
+              <button type="button" id="btn-download-pl-1" data-pl-name="caso1_hospital.pl" class="text-xs px-3 py-1.5 rounded-lg bg-[#1569AE] hover:bg-[#0080FB] text-white font-bold transition flex items-center gap-1.5">
+                <span>💾</span> Descargar caso1_hospital.pl
+              </button>
+            </div>
+          </div>
+
+          <textarea id="kb-code-1" data-kb-ex="ej6_practica_caso1" data-expected-preds="[&quot;atiende/2&quot;, &quot;turno/2&quot;, &quot;complejidad/2&quot;, &quot;guardia_critica/1&quot;, &quot;especialista_manana/2&quot;]" rows="14" spellcheck="false" aria-label="Editor de Base de Conocimientos Prolog para Ejercicio P1: Guardia y Triaje del Hospital Universitario (Prolog)" class="w-full p-4 bg-[#010E1C] text-[#FFED00] rounded-xl text-xs prolog-code border border-[#1569AE] focus:outline-none focus:ring-2 focus:ring-[#0080FB] leading-relaxed">:- discontiguous atiende/2.
+:- discontiguous turno/2.
+:- discontiguous complejidad/2.
+
+% 1. Escribe aquí los 9 hechos (atiende/2, turno/2 y complejidad/2):
+
+
+% 2. Escribe aquí las 2 reglas (guardia_critica/1 y especialista_manana/2):
+</textarea>
+
+          <!-- Panel de Validador Sintáctico en Tiempo Real (Linter Prolog) -->
+          <div id="linter-panel-1" class="p-3.5 rounded-xl bg-[#01305B]/90 border border-[#6EC1E4]/40 space-y-2 text-xs">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="font-extrabold text-[#6EC1E4] flex items-center gap-1.5">
+                <span>🔍</span> Validador Sintáctico de Edimburgo en Tiempo Real:
+              </span>
+              <div class="flex flex-wrap items-center gap-2">
+                <span id="linter-facts-1" class="px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-200 font-bold border border-slate-600">
+                  Hechos válidos: 0 / 9
+                </span>
+                <span id="linter-rules-1" class="px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-200 font-bold border border-slate-600">
+                  Reglas deductivas: 0 / 2
+                </span>
+                <span id="linter-status-1" class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-400/40">
+                  ⏳ Pendiente de codificar
+                </span>
+              </div>
+            </div>
+            <div id="linter-preds-1" class="text-[11px] text-slate-300 prolog-code"></div>
+            <ul id="linter-warnings-1" class="space-y-1 text-amber-300 text-[11px] list-disc list-inside"></ul>
+          </div>
+
+          <!-- Sandbox SWISH Embebido para Pruebas Interactivas -->
+          <div class="space-y-2 pt-2 border-t border-[#1569AE]/40 compiler-sandbox">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-300 gap-2">
+              <span>💡 <strong>Laboratorio SWISH en Línea:</strong> Pulsa <em>"Copiar KB para SWISH"</em> arriba, pégala a la izquierda en SWISH y ejecuta tus consultas a la derecha <strong>sin anteponer <code>?-</code></strong>.</span>
+              <a href="https://swish.swi-prolog.org/" target="_blank" rel="noopener noreferrer" class="text-[#FFED00] underline hover:text-white font-bold shrink-0">
+                Abrir SWISH en pestaña nueva ↗
+              </a>
+            </div>
+            <div class="rounded-xl overflow-hidden border-2 border-[#1569AE] bg-white">
+              <iframe src="https://swish.swi-prolog.org/" class="w-full h-[380px] border-0" title="SWISH Sandbox - Ejercicio P1: Guardia y Triaje del Hospital Universitario (Prolog)" loading="lazy"></iframe>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN B (12 PUNTOS): CUESTIONARIO DE CONSULTAS, SLD, BACKTRACKING Y CWA -->
+        <div class="space-y-3.5 pt-2">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-extrabold uppercase tracking-wider text-[#01305B] dark:text-[#FFED00]">
+              Sección B • Preguntas de Verificación de Consultas, Backtracking y CWA (12 Puntos = 6 &times; 2 pts):
+            </h4>
+          </div>
+          <!-- Pregunta Práctica 1: item_proposito_discontiguous_hospital -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#0080FB] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#FFED00] text-sm block">1. Directiva de compilación y estructura de predicados:</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">¿Qué función cumple la directiva ':- discontiguous atiende/2.' al codificar tu base de conocimientos?</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej6_practica_caso1" data-key="item_proposito_discontiguous_hospital" aria-label="1. Directiva de compilación y estructura de predicados:" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la opción en Prolog --</option>
+                <option value="ordena_alfabeticamente_los_medicos">Ordena alfabéticamente los hechos antes de ejecutar el motor de inferencia</option>
+                <option value="permite_agrupar_hechos_por_entidad_sin_warning">Permite declarar cláusulas de un mismo predicado/aridad separadas entre sí (por ejemplo agrupadas por médico) sin que SWI-Prolog emita advertencias</option>
+                <option value="convierte_atomos_en_variables_globales">Transforma automáticamente los átomos en variables globales exportables</option>
+                <option value="activa_encadenamiento_hacia_adelante">Desactiva la resolución SLD y fuerza encadenamiento hacia adelante</option>
+              </select>
+            </div>
+          </div>
+          <!-- Pregunta Práctica 2: item_consulta_medicos_manana -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#0080FB] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#FFED00] text-sm block">2. Formulación de consulta existencial en SWISH: "¿Qué médicos trabajan en el turno mañana?":</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">Meta exacta que debe ingresarse en la consola de consultas para ligar la variable Medico:</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej6_practica_caso1" data-key="item_consulta_medicos_manana" aria-label="2. Formulación de consulta existencial en SWISH: &quot;¿Qué médicos trabajan en el turno mañana?&quot;:" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la opción en Prolog --</option>
+                <option value="turno(medico, manana).">turno(medico, manana).</option>
+                <option value="turno(Medico, manana).">turno(Medico, manana).</option>
+                <option value="?- turno(Medico, Manana).">?- turno(Medico, Manana).</option>
+                <option value="quien_trabaja(manana, Medico).">quien_trabaja(manana, Medico).</option>
+              </select>
+            </div>
+          </div>
+          <!-- Pregunta Práctica 3: item_backtracking_guardia_critica -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#0080FB] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#FFED00] text-sm block">3. Mecanismo de Backtracking en la consulta existencial guardia_critica(Medico).:</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">Si declaraste los médicos en el orden de las tarjetas (Sosa, Paz, Luna), ¿qué secuencia de soluciones arroja SWISH al pulsar 'Next' (;)?</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej6_practica_caso1" data-key="item_backtracking_guardia_critica" aria-label="3. Mecanismo de Backtracking en la consulta existencial guardia_critica(Medico).:" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la opción en Prolog --</option>
+                <option value="solo_dra_luna_y_termina">Devuelve únicamente Medico = dra_luna</option>
+                <option value="dra_sosa_luego_dr_paz_y_false">Devuelve primero Medico = dra_sosa, al pedir otra solución (;) devuelve Medico = dr_paz, y finalmente false al agotar la rama de dra_luna</option>
+                <option value="devuelve_true_sin_ligar_variable">Devuelve únicamente el booleano true sin mostrar el nombre de los médicos</option>
+                <option value="cicla_infinitamente_entre_sosa_y_paz">Repite infinitamente dra_sosa y dr_paz sin detenerse</option>
+              </select>
+            </div>
+          </div>
+          <!-- Pregunta Práctica 4: item_evaluacion_paz_critica -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#0080FB] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#FFED00] text-sm block">4. Resolución SLD de la consulta cerrada guardia_critica(dr_paz).:</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">¿Qué respuesta arroja el motor de inferencia de SWI-Prolog y bajo qué justificación lógica?</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej6_practica_caso1" data-key="item_evaluacion_paz_critica" aria-label="4. Resolución SLD de la consulta cerrada guardia_critica(dr_paz).:" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la opción en Prolog --</option>
+                <option value="false_porque_trabaja_de_noche">false, porque el Dr. Paz cumple turno de noche y no de mañana</option>
+                <option value="true_unifica_traumatologia_complejidad_alta">true, porque unifica la variable intermedia con traumatologia y verifica que su complejidad es alta</option>
+                <option value="error_variable_no_instanciada">Error de ejecución por usar constantes sin comillas dobles</option>
+                <option value="esp_igual_cardiologia">Devuelve Especialidad = cardiologia por backtracking automático</option>
+              </select>
+            </div>
+          </div>
+          <!-- Pregunta Práctica 5: item_consulta_especialista_manana_conjuncion -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#0080FB] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#FFED00] text-sm block">5. Evaluación de la regla conjuntiva especialista_manana(dr_paz, Especialidad).:</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">Al consultar en SWISH qué especialidad atiende el Dr. Paz por la mañana, ¿qué ocurre durante la resolución SLD?</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej6_practica_caso1" data-key="item_consulta_especialista_manana_conjuncion" aria-label="5. Evaluación de la regla conjuntiva especialista_manana(dr_paz, Especialidad).:" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la opción en Prolog --</option>
+                <option value="unifica_traumatologia_con_exito">Unifica Especialidad = traumatologia y devuelve true</option>
+                <option value="falla_en_segunda_submeta_turno_manana">La primera submeta liga Especialidad = traumatologia, pero la segunda submeta falla porque el Dr. Paz tiene turno noche, retornando false</option>
+                <option value="cambia_el_turno_a_manana">Modifica dinámicamente la base de hechos asignándole turno mañana</option>
+                <option value="retorna_dra_sosa">Reemplaza dr_paz por dra_sosa y devuelve cardiologia</option>
+              </select>
+            </div>
+          </div>
+          <!-- Pregunta Práctica 6: item_evaluacion_luna_critica_cwa -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#0080FB] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#FFED00] text-sm block">6. Supuesto de Mundo Cerrado (CWA) y Negación como Falla en \+ guardia_critica(dra_luna).:</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">¿Qué responde Prolog al evaluar la consulta negada '\+ guardia_critica(dra_luna).' y por qué?</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej6_practica_caso1" data-key="item_evaluacion_luna_critica_cwa" aria-label="6. Supuesto de Mundo Cerrado (CWA) y Negación como Falla en \+ guardia_critica(dra_luna).:" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la opción en Prolog --</option>
+                <option value="false_porque_dra_luna_existe">false, porque dra_luna está registrada como médica del hospital</option>
+                <option value="true_porque_guardia_critica_falla_bajo_cwa">true, porque guardia_critica(dra_luna) falla bajo CWA (pediatría tiene complejidad media, no alta) y el operador de Negación como Falla (\+) invierte el fallo a éxito</option>
+                <option value="unknown_indeterminado">unknown, ya que Prolog opera con lógica trivalente abierta</option>
+                <option value="syntax_error_operador_naf">Error de sintaxis porque Prolog no admite el operador \+</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Orientación Bibliográfica Oficial -->
+        <details class="group mt-4 rounded-xl border border-[#1569AE]/30 bg-[#F4F6F9] dark:bg-[#01182E]/80 p-3.5 text-xs text-slate-700 dark:text-slate-200 transition-all">
+          <summary class="flex cursor-pointer items-center justify-between font-bold text-[#01305B] dark:text-[#FFED00] select-none">
+            <span>📖 Dónde estudiar este tema en la bibliografía oficial de cátedra</span>
+            <span class="transition group-open:rotate-180">▾</span>
+          </summary>
+          <div class="mt-2.5 pt-2.5 border-t border-slate-300 dark:border-[#154D80] space-y-1">
+            <p><strong>Referencia Bibliográfica:</strong> <a href="http://jdelagarza.fime.uanl.mx/IA/Libros/inteligencia-artificial-un-enfoque-moderno-stuart-j-russell.pdf" target="_blank" rel="noopener noreferrer" class="underline text-[#1569AE] dark:text-[#6EC1E4] hover:text-[#01305B] font-semibold">Russell &amp; Norvig — Inteligencia Artificial: Un Enfoque Moderno</a> &bull; Russell & Norvig Cap. 9.4–9.5 (pp. 302–308) • Diapositivas Clase 7 (`7 - Lógica aplicada en PROLOG.pptx`, Slides 6–17).</p>
+          </div>
+        </details>
+      </article>
+      <!-- =====================================================================
+           EJERCICIO P2: RED DE SENSORES IOT Y RIEGO INTELIGENTE AGROINDUSTRIAL (PROLOG)
+      ====================================================================== -->
+      <article class="ucse-card-gold p-6 md:p-8 bg-white dark:bg-[#023967]/90 border border-slate-200 dark:border-[#154D80] space-y-6">
+        <!-- Cabecera del Caso Práctico -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-[#154D80] pb-4">
+          <div>
+            <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-extrabold bg-[#FFED00] text-[#01305B] border border-[#01305B]/20 mb-1.5">
+              <span>💻 Caso Práctico 2 • 25 Puntos (13 pts KB + 12 pts Consultas)</span>
+            </div>
+            <h3 class="text-lg md:text-xl font-extrabold text-[#01305B] dark:text-white ucse-heading">Ejercicio P2: Red de Sensores IoT y Riego Inteligente Agroindustrial (Prolog)</h3>
+          </div>
+          <span class="px-3.5 py-1 rounded-full bg-[#01305B] text-[#FFED00] text-xs font-extrabold self-start sm:self-auto shrink-0">
+            25 Puntos Totales
+          </span>
+        </div>
+
+        <!-- Enunciado y Tarjetas de Especificación del Dominio -->
+        <div class="space-y-4 text-sm text-slate-700 dark:text-slate-200 leading-relaxed">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <p class="max-w-3xl">Una finca tecnificada de los valles templados monitorea sus 3 lotes agrícolas mediante sensores IoT. A partir de las tarjetas técnicas del dominio, debes codificar en el editor los 9 hechos y las 2 reglas deductivas solicitadas:</p>
+            <div class="inline-flex flex-wrap items-center gap-1.5 p-1.5 rounded-xl bg-slate-100 dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] text-xs shrink-0">
+              <button type="button" class="filter-btn filter-d2-btn px-3 py-1.5 rounded-lg active transition text-slate-700 dark:text-slate-200 font-medium" data-filter="all">🌱 Todos los Lotes</button>
+              <button type="button" class="filter-btn filter-d2-btn px-3 py-1.5 rounded-lg  transition text-slate-700 dark:text-slate-200 font-medium" data-filter="seco">🟠 Suelo Seco</button>
+              <button type="button" class="filter-btn filter-d2-btn px-3 py-1.5 rounded-lg  transition text-slate-700 dark:text-slate-200 font-medium" data-filter="optimo">🟢 Suelo Óptimo</button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+            <div class="domain2-card p-5 rounded-xl bg-[#F4F6F9] dark:bg-[#012243] border border-slate-200 dark:border-[#154D80] hover:border-[#0080FB] transition-all duration-300 shadow-sm space-y-3.5" data-category="seco">
+              <div class="flex items-center justify-between gap-2">
+                <span class="font-bold text-[#01305B] dark:text-white text-sm">🍇 Sector 1: Lote Norte</span>
+                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30">
+                  🟠 Humedad: seco
+                </span>
+              </div>
+              <div class="space-y-1.5">
+                <span class="text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider block font-bold">Datos Técnicos a Modelar en Prolog:</span>
+                <div class="flex flex-col gap-1.5">
+                  <span class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] text-xs text-[#01305B] dark:text-slate-100 flex items-center gap-1.5">
+                    <span aria-hidden="true">🆔</span> <span>Átomo del lote: lote_norte</span>
+                  </span>
+                  <span class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] text-xs text-[#01305B] dark:text-slate-100 flex items-center gap-1.5">
+                    <span aria-hidden="true">🍇</span> <span>Especie cultivada: vid</span>
+                  </span>
+                  <span class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] text-xs text-[#01305B] dark:text-slate-100 flex items-center gap-1.5">
+                    <span aria-hidden="true">🏜️</span> <span>Estado de humedad: seco</span>
+                  </span>
+                  <span class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] text-xs text-[#01305B] dark:text-slate-100 flex items-center gap-1.5">
+                    <span aria-hidden="true">💧</span> <span>Tecnología de riego: goteo</span>
+                  </span>
+                </div>
+              </div>
+              <div class="pt-2 border-t border-slate-200 dark:border-[#154D80] flex items-center justify-between text-xs text-slate-600 dark:text-slate-300 font-medium">
+                <span>Cultivo: vid</span>
+                <span class="text-[#1569AE] dark:text-[#FFED00] font-bold">Riego: goteo</span>
+              </div>
+            </div>
+            <div class="domain2-card p-5 rounded-xl bg-[#F4F6F9] dark:bg-[#012243] border border-slate-200 dark:border-[#154D80] hover:border-[#0080FB] transition-all duration-300 shadow-sm space-y-3.5" data-category="optimo">
+              <div class="flex items-center justify-between gap-2">
+                <span class="font-bold text-[#01305B] dark:text-white text-sm">🫒 Sector 2: Lote Central</span>
+                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30">
+                  🟢 Humedad: optimo
+                </span>
+              </div>
+              <div class="space-y-1.5">
+                <span class="text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider block font-bold">Datos Técnicos a Modelar en Prolog:</span>
+                <div class="flex flex-col gap-1.5">
+                  <span class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] text-xs text-[#01305B] dark:text-slate-100 flex items-center gap-1.5">
+                    <span aria-hidden="true">🆔</span> <span>Átomo del lote: lote_central</span>
+                  </span>
+                  <span class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] text-xs text-[#01305B] dark:text-slate-100 flex items-center gap-1.5">
+                    <span aria-hidden="true">🫒</span> <span>Especie cultivada: olivo</span>
+                  </span>
+                  <span class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] text-xs text-[#01305B] dark:text-slate-100 flex items-center gap-1.5">
+                    <span aria-hidden="true">✅</span> <span>Estado de humedad: optimo</span>
+                  </span>
+                  <span class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] text-xs text-[#01305B] dark:text-slate-100 flex items-center gap-1.5">
+                    <span aria-hidden="true">💧</span> <span>Tecnología de riego: goteo</span>
+                  </span>
+                </div>
+              </div>
+              <div class="pt-2 border-t border-slate-200 dark:border-[#154D80] flex items-center justify-between text-xs text-slate-600 dark:text-slate-300 font-medium">
+                <span>Cultivo: olivo</span>
+                <span class="text-[#1569AE] dark:text-[#FFED00] font-bold">Riego: goteo</span>
+              </div>
+            </div>
+            <div class="domain2-card p-5 rounded-xl bg-[#F4F6F9] dark:bg-[#012243] border border-slate-200 dark:border-[#154D80] hover:border-[#0080FB] transition-all duration-300 shadow-sm space-y-3.5" data-category="seco">
+              <div class="flex items-center justify-between gap-2">
+                <span class="font-bold text-[#01305B] dark:text-white text-sm">🌿 Sector 3: Lote Sur</span>
+                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30">
+                  🟠 Humedad: seco
+                </span>
+              </div>
+              <div class="space-y-1.5">
+                <span class="text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider block font-bold">Datos Técnicos a Modelar en Prolog:</span>
+                <div class="flex flex-col gap-1.5">
+                  <span class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] text-xs text-[#01305B] dark:text-slate-100 flex items-center gap-1.5">
+                    <span aria-hidden="true">🆔</span> <span>Átomo del lote: lote_sur</span>
+                  </span>
+                  <span class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] text-xs text-[#01305B] dark:text-slate-100 flex items-center gap-1.5">
+                    <span aria-hidden="true">🌿</span> <span>Especie cultivada: tabaco</span>
+                  </span>
+                  <span class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] text-xs text-[#01305B] dark:text-slate-100 flex items-center gap-1.5">
+                    <span aria-hidden="true">🏜️</span> <span>Estado de humedad: seco</span>
+                  </span>
+                  <span class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] text-xs text-[#01305B] dark:text-slate-100 flex items-center gap-1.5">
+                    <span aria-hidden="true">🚿</span> <span>Tecnología de riego: aspersion</span>
+                  </span>
+                </div>
+              </div>
+              <div class="pt-2 border-t border-slate-200 dark:border-[#154D80] flex items-center justify-between text-xs text-slate-600 dark:text-slate-300 font-medium">
+                <span>Cultivo: tabaco</span>
+                <span class="text-[#1569AE] dark:text-[#FFED00] font-bold">Riego: aspersion</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabla de Especificación de Predicados y Reglas a Codificar -->
+          <div class="p-4 rounded-xl bg-[#F4F6F9] dark:bg-[#012243] border border-[#B6C9DB] dark:border-[#1569AE] space-y-2.5">
+            <h4 class="text-xs font-extrabold uppercase tracking-wider text-[#01305B] dark:text-[#FFED00]">
+              📐 Especificación de Predicados y Reglas a Codificar en tu Base de Conocimientos (13 Puntos):
+            </h4>
+            <div class="space-y-1.5">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-[#1569AE]/15 text-[#01305B] dark:text-[#6EC1E4] shrink-0">Hechos (3 × 1 pt)</span>
+                  <code class="text-xs font-bold prolog-code text-[#01305B] dark:text-[#FFED00]">cultivo(Lote, Especie)</code>
+                </div>
+                <span class="text-xs text-slate-600 dark:text-slate-300">Hecho binario (/2): asocia cada lote ('lote_norte', 'lote_central', 'lote_sur') con su especie ('vid', 'olivo', 'tabaco').</span>
+              </div>
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-[#1569AE]/15 text-[#01305B] dark:text-[#6EC1E4] shrink-0">Hechos (3 × 1 pt)</span>
+                  <code class="text-xs font-bold prolog-code text-[#01305B] dark:text-[#FFED00]">humedad(Lote, EstadoHumedad)</code>
+                </div>
+                <span class="text-xs text-slate-600 dark:text-slate-300">Hecho binario (/2): registra el estado hídrico actual del lote ('seco' u 'optimo').</span>
+              </div>
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-[#1569AE]/15 text-[#01305B] dark:text-[#6EC1E4] shrink-0">Hechos (3 × 1 pt)</span>
+                  <code class="text-xs font-bold prolog-code text-[#01305B] dark:text-[#FFED00]">sistema_riego(Lote, TipoRiego)</code>
+                </div>
+                <span class="text-xs text-slate-600 dark:text-slate-300">Hecho binario (/2): indica la tecnología instalada en el lote ('goteo' o 'aspersion').</span>
+              </div>
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-[#FFED00] text-[#01305B] shrink-0">Regla (2 pts)</span>
+                  <code class="text-xs font-bold prolog-code text-[#01305B] dark:text-[#FFED00]">requiere_riego_urgente(Lote)</code>
+                </div>
+                <span class="text-xs text-slate-600 dark:text-slate-300">Regla deductiva (/1): verdadero si el estado de humedad del Lote es 'seco'.</span>
+              </div>
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 rounded-lg bg-white dark:bg-[#01182E] border border-slate-200 dark:border-[#154D80] gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-[#FFED00] text-[#01305B] shrink-0">Regla (2 pts)</span>
+                  <code class="text-xs font-bold prolog-code text-[#01305B] dark:text-[#FFED00]">lote_goteo_seco(Lote, Especie)</code>
+                </div>
+                <span class="text-xs text-slate-600 dark:text-slate-300">Regla deductiva (/2): verdadero si el Lote tiene humedad 'seco' (o requiere riego urgente), utiliza sistema de riego por 'goteo' y cultiva la Especie.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN A (13 PUNTOS): EDITOR DE ENTREGA DE BASE DE CONOCIMIENTOS + LINTER EN VIVO -->
+        <div class="p-5 rounded-2xl bg-[#01182E] text-slate-100 border-2 border-[#0080FB] space-y-4">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-[#1569AE]/50 pb-3">
+            <div>
+              <span class="px-2.5 py-0.5 rounded bg-[#FFED00] text-[#01305B] text-[11px] font-extrabold uppercase">Sección A • 13 Puntos (9 Hechos + 2 Reglas)</span>
+              <h4 class="text-sm font-extrabold text-white mt-1 ucse-heading">
+                ✍️ Editor de Entrega de Base de Conocimientos (<code>caso2_agro_iot.pl</code>)
+              </h4>
+              <p class="text-xs text-slate-300">
+                Escribe aquí tu código Prolog completo (o prográmalo abajo en SWISH y pégalo aquí). Se guarda automáticamente en el JSON de entrega y se evalúa con normalización canónica (&alpha;-equivalencia).
+              </p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 shrink-0">
+              <button type="button" id="btn-copy-prolog-2" class="text-xs px-3 py-1.5 rounded-lg bg-[#FFED00] hover:bg-[#FDD247] text-[#01305B] font-extrabold transition shadow flex items-center gap-1.5">
+                <span>📋</span> Copiar KB para SWISH
+              </button>
+              <button type="button" id="btn-load-pl-2" class="text-xs px-3 py-1.5 rounded-lg bg-[#023967] hover:bg-[#1569AE] text-white border border-[#6EC1E4]/40 font-bold transition flex items-center gap-1.5">
+                <span>📂</span> Cargar .pl
+              </button>
+              <input type="file" id="input-load-pl-2" accept=".pl,.txt" class="hidden">
+              <button type="button" id="btn-download-pl-2" data-pl-name="caso2_agro_iot.pl" class="text-xs px-3 py-1.5 rounded-lg bg-[#1569AE] hover:bg-[#0080FB] text-white font-bold transition flex items-center gap-1.5">
+                <span>💾</span> Descargar caso2_agro_iot.pl
+              </button>
+            </div>
+          </div>
+
+          <textarea id="kb-code-2" data-kb-ex="ej7_practica_caso2" data-expected-preds="[&quot;cultivo/2&quot;, &quot;humedad/2&quot;, &quot;sistema_riego/2&quot;, &quot;requiere_riego_urgente/1&quot;, &quot;lote_goteo_seco/2&quot;]" rows="14" spellcheck="false" aria-label="Editor de Base de Conocimientos Prolog para Ejercicio P2: Red de Sensores IoT y Riego Inteligente Agroindustrial (Prolog)" class="w-full p-4 bg-[#010E1C] text-[#FFED00] rounded-xl text-xs prolog-code border border-[#1569AE] focus:outline-none focus:ring-2 focus:ring-[#0080FB] leading-relaxed">:- discontiguous cultivo/2.
+:- discontiguous humedad/2.
+:- discontiguous sistema_riego/2.
+
+% 1. Escribe aquí los 9 hechos (cultivo/2, humedad/2 y sistema_riego/2):
+
+
+% 2. Escribe aquí las 2 reglas (requiere_riego_urgente/1 y lote_goteo_seco/2):
+</textarea>
+
+          <!-- Panel de Validador Sintáctico en Tiempo Real (Linter Prolog) -->
+          <div id="linter-panel-2" class="p-3.5 rounded-xl bg-[#01305B]/90 border border-[#6EC1E4]/40 space-y-2 text-xs">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="font-extrabold text-[#6EC1E4] flex items-center gap-1.5">
+                <span>🔍</span> Validador Sintáctico de Edimburgo en Tiempo Real:
+              </span>
+              <div class="flex flex-wrap items-center gap-2">
+                <span id="linter-facts-2" class="px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-200 font-bold border border-slate-600">
+                  Hechos válidos: 0 / 9
+                </span>
+                <span id="linter-rules-2" class="px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-200 font-bold border border-slate-600">
+                  Reglas deductivas: 0 / 2
+                </span>
+                <span id="linter-status-2" class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-400/40">
+                  ⏳ Pendiente de codificar
+                </span>
+              </div>
+            </div>
+            <div id="linter-preds-2" class="text-[11px] text-slate-300 prolog-code"></div>
+            <ul id="linter-warnings-2" class="space-y-1 text-amber-300 text-[11px] list-disc list-inside"></ul>
+          </div>
+
+          <!-- Sandbox SWISH Embebido para Pruebas Interactivas -->
+          <div class="space-y-2 pt-2 border-t border-[#1569AE]/40 compiler-sandbox">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-300 gap-2">
+              <span>💡 <strong>Laboratorio SWISH en Línea:</strong> Pulsa <em>"Copiar KB para SWISH"</em> arriba, pégala a la izquierda en SWISH y ejecuta tus consultas a la derecha <strong>sin anteponer <code>?-</code></strong>.</span>
+              <a href="https://swish.swi-prolog.org/" target="_blank" rel="noopener noreferrer" class="text-[#FFED00] underline hover:text-white font-bold shrink-0">
+                Abrir SWISH en pestaña nueva ↗
+              </a>
+            </div>
+            <div class="rounded-xl overflow-hidden border-2 border-[#1569AE] bg-white">
+              <iframe src="https://swish.swi-prolog.org/" class="w-full h-[380px] border-0" title="SWISH Sandbox - Ejercicio P2: Red de Sensores IoT y Riego Inteligente Agroindustrial (Prolog)" loading="lazy"></iframe>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN B (12 PUNTOS): CUESTIONARIO DE CONSULTAS, SLD, BACKTRACKING Y CWA -->
+        <div class="space-y-3.5 pt-2">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-extrabold uppercase tracking-wider text-[#01305B] dark:text-[#FFED00]">
+              Sección B • Preguntas de Verificación de Consultas, Backtracking y CWA (12 Puntos = 6 &times; 2 pts):
+            </h4>
+          </div>
+          <!-- Pregunta Práctica 1: item_convencion_edimburgo_atomos -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#0080FB] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#FFED00] text-sm block">1. Convención sintáctica de Edimburgo para constantes vs. variables:</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">¿Qué ocurre en SWI-Prolog si en lugar de escribir 'vid' o 'lote_norte' escribes 'Vid' o 'Lote_Norte' con mayúscula inicial dentro de un hecho?</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej7_practica_caso2" data-key="item_convencion_edimburgo_atomos" aria-label="1. Convención sintáctica de Edimburgo para constantes vs. variables:" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la opción en Prolog --</option>
+                <option value="es_identico_case_insensitive">Es exactamente igual porque Prolog no distingue mayúsculas de minúsculas</option>
+                <option value="lo_interpreta_como_variable_libre_universal">Prolog lo interpreta como una Variable lógica libre (cuantificada universalmente), alterando por completo la semántica de la base de hechos</option>
+                <option value="lo_convierte_en_numero_entero">El compilador convierte el identificador en una constante numérica igual a cero</option>
+                <option value="genera_comentario_bloque">Ignora toda la línea tratándola como un comentario</option>
+              </select>
+            </div>
+          </div>
+          <!-- Pregunta Práctica 2: item_consulta_lotes_goteo -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#0080FB] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#FFED00] text-sm block">2. Formulación de consulta existencial: "¿Qué lotes cuentan con sistema de riego por goteo?":</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">Expresión exacta para consultar la base de conocimiento en SWISH:</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej7_practica_caso2" data-key="item_consulta_lotes_goteo" aria-label="2. Formulación de consulta existencial: &quot;¿Qué lotes cuentan con sistema de riego por goteo?&quot;:" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la opción en Prolog --</option>
+                <option value="sistema_riego(lote, goteo).">sistema_riego(lote, goteo).</option>
+                <option value="sistema_riego(Lote, goteo).">sistema_riego(Lote, goteo).</option>
+                <option value="sistema_riego(Goteo, Lote).">sistema_riego(Goteo, Lote).</option>
+                <option value="riego_goteo(Lote).">riego_goteo(Lote).</option>
+              </select>
+            </div>
+          </div>
+          <!-- Pregunta Práctica 3: item_backtracking_riego_urgente -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#0080FB] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#FFED00] text-sm block">3. Soluciones por Backtracking de la consulta requiere_riego_urgente(Lote).:</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">Al evaluar requiere_riego_urgente(Lote). en SWISH y solicitar todas las soluciones con ';', ¿qué lotes se obtienen?</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej7_practica_caso2" data-key="item_backtracking_riego_urgente" aria-label="3. Soluciones por Backtracking de la consulta requiere_riego_urgente(Lote).:" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la opción en Prolog --</option>
+                <option value="solo_lote_central">Únicamente Lote = lote_central</option>
+                <option value="lote_norte_y_lote_sur">Lote = lote_norte y luego Lote = lote_sur (los dos lotes cuyo estado de humedad es seco)</option>
+                <option value="los_tres_lotes_por_igual">Los tres lotes (lote_norte, lote_central y lote_sur)</option>
+                <option value="ningun_lote_false">false en el primer intento</option>
+              </select>
+            </div>
+          </div>
+          <!-- Pregunta Práctica 4: item_resultado_lote_goteo_seco -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#0080FB] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#FFED00] text-sm block">4. Resultado de la consulta existencial lote_goteo_seco(Lote, Especie).:</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">Al ejecutar dicha meta en SWISH con los 3 lotes cargados, ¿qué unificación devuelve el motor?</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej7_practica_caso2" data-key="item_resultado_lote_goteo_seco" aria-label="4. Resultado de la consulta existencial lote_goteo_seco(Lote, Especie).:" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la opción en Prolog --</option>
+                <option value="lote_central_y_olivo">Lote = lote_central, Especie = olivo</option>
+                <option value="lote_norte_y_vid">Lote = lote_norte, Especie = vid (único lote que cumple simultáneamente humedad seco y riego por goteo)</option>
+                <option value="lote_sur_y_tabaco">Lote = lote_sur, Especie = tabaco</option>
+                <option value="false_ningun_lote_cumple">false, ningún lote satisface las tres metas</option>
+              </select>
+            </div>
+          </div>
+          <!-- Pregunta Práctica 5: item_variable_anonima_agro -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#0080FB] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#FFED00] text-sm block">5. Uso de la Variable Anónima (_) en consultas de existencia:</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">Si deseas consultar únicamente si existe algún lote con humedad 'seco' sin importar qué lote sea ni imprimir su ligadura, ¿qué consulta debes formular?</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej7_practica_caso2" data-key="item_variable_anonima_agro" aria-label="5. Uso de la Variable Anónima (_) en consultas de existencia:" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la opción en Prolog --</option>
+                <option value="humedad(Anonimo, seco).">humedad(Anonimo, seco).</option>
+                <option value="humedad(_, seco).">humedad(_, seco).</option>
+                <option value="humedad(?, seco).">humedad(?, seco).</option>
+                <option value="humedad(null, seco).">humedad(null, seco).</option>
+              </select>
+            </div>
+          </div>
+          <!-- Pregunta Práctica 6: item_evaluacion_central_urgente_cwa -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-slate-50 dark:bg-[#012243] rounded-xl border border-slate-200 dark:border-[#154D80] hover:border-[#0080FB] transition-all gap-4">
+            <div class="lg:max-w-xl space-y-1">
+              <span class="font-bold text-[#01305B] dark:text-[#FFED00] text-sm block">6. Evaluación booleana bajo CWA de requiere_riego_urgente(lote_central).:</span>
+              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed block">¿Cuál es la salida de la consola de Prolog y su fundamento formal?</span>
+            </div>
+            <div class="lg:w-96 shrink-0">
+              <select data-ex="ej7_practica_caso2" data-key="item_evaluacion_central_urgente_cwa" aria-label="6. Evaluación booleana bajo CWA de requiere_riego_urgente(lote_central).:" class="w-full bg-white dark:bg-[#01182E] text-slate-800 dark:text-slate-100 border border-[#B6C9DB] dark:border-[#1569AE] rounded-lg px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0080FB] transition shadow-sm cursor-pointer">
+                <option value="" disabled selected>-- Selecciona la opción en Prolog --</option>
+                <option value="true_porque_tiene_goteo">true, porque el lote central posee riego por goteo instalado</option>
+                <option value="false_humedad_optima_no_unifica_seco">false, porque humedad(lote_central, optimo) no unifica con el átomo seco exigido por la regla bajo el Supuesto de Mundo Cerrado</option>
+                <option value="true_por_backtracking_lote_sur">true, porque hace backtracking automático hacia el lote sur</option>
+                <option value="optimo_como_atomo">Imprime la palabra optimo en lugar de un valor booleano</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Orientación Bibliográfica Oficial -->
+        <details class="group mt-4 rounded-xl border border-[#1569AE]/30 bg-[#F4F6F9] dark:bg-[#01182E]/80 p-3.5 text-xs text-slate-700 dark:text-slate-200 transition-all">
+          <summary class="flex cursor-pointer items-center justify-between font-bold text-[#01305B] dark:text-[#FFED00] select-none">
+            <span>📖 Dónde estudiar este tema en la bibliografía oficial de cátedra</span>
+            <span class="transition group-open:rotate-180">▾</span>
+          </summary>
+          <div class="mt-2.5 pt-2.5 border-t border-slate-300 dark:border-[#154D80] space-y-1">
+            <p><strong>Referencia Bibliográfica:</strong> <a href="http://jdelagarza.fime.uanl.mx/IA/Libros/inteligencia-artificial-un-enfoque-moderno-stuart-j-russell.pdf" target="_blank" rel="noopener noreferrer" class="underline text-[#1569AE] dark:text-[#6EC1E4] hover:text-[#01305B] font-semibold">Russell &amp; Norvig — Inteligencia Artificial: Un Enfoque Moderno</a> &bull; Russell & Norvig Cap. 9.4–9.5 (pp. 302–308) • Diapositivas Clase 7 (`7 - Lógica aplicada en PROLOG.pptx`, Slides 11–20).</p>
+          </div>
+        </details>
+      </article>
+    </section>
+
+    <!-- =========================================================================
+         TARJETA DE CIERRE, PREVISUALIZACIÓN Y DESCARGA DE ENTREGA JSON
+    ========================================================================== -->
+    <section class="ucse-card p-6 md:p-8 bg-white dark:bg-[#023967] border border-slate-200 dark:border-[#154D80] text-center space-y-5">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#01305B] text-[#FFED00] text-xs font-extrabold">
+        <span>✅</span> Finalización y Entrega Oficial de la Instancia
+      </div>
+      <h3 class="text-xl md:text-2xl font-extrabold text-[#01305B] dark:text-white ucse-heading">
+        Generar y Exportar Archivo de Respuestas + Bases de Conocimiento (<code>respuestas_simulacro.json</code>)
+      </h3>
+      <p class="text-slate-600 dark:text-slate-200 text-sm max-w-2xl mx-auto">
+        Verifica que el indicador superior marque <strong>34 de 34 completados (100%)</strong> (20 preguntas teóricas, las 2 Bases de Conocimiento Prolog con sus 9 hechos y 2 reglas cada una, y las 12 preguntas de consultas). Descarga el JSON y ejecuta <code>python autograder_simulacro.py respuestas_simulacro.json</code>.
+      </p>
+
+      <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+        <button type="button" id="btn-export-json-footer" class="px-6 py-3 rounded-xl bg-[#01305B] hover:bg-[#1569AE] text-[#FFED00] font-extrabold text-sm shadow-lg transition flex items-center gap-2">
+          <span>📥</span> Generar y Descargar respuestas_simulacro.json
+        </button>
+        <button type="button" id="btn-preview-json" class="px-4 py-3 rounded-xl bg-[#F4F6F9] dark:bg-[#01182E] hover:bg-slate-200 text-[#01305B] dark:text-white border border-[#B6C9DB] dark:border-[#1569AE] font-bold text-xs transition flex items-center gap-1.5">
+          <span>👁️</span> Previsualizar JSON en Pantalla
+        </button>
+        <button type="button" id="btn-import-json" class="px-4 py-3 rounded-xl bg-[#F4F6F9] dark:bg-[#01182E] hover:bg-slate-200 text-[#01305B] dark:text-white border border-[#B6C9DB] dark:border-[#1569AE] font-bold text-xs transition flex items-center gap-1.5">
+          <span>📂</span> Importar JSON Previo
+        </button>
+        <input type="file" id="input-import-json" accept=".json" class="hidden">
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =========================================================================
+       PIE DE PÁGINA INSTITUCIONAL UCSE (#01305B)
+  ========================================================================== -->
+  <footer class="bg-[#01305B] text-white border-t-4 border-[#FFED00] mt-12 py-8 text-xs">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="space-y-1 text-center sm:text-left">
+        <p class="font-extrabold text-sm text-[#FFED00] ucse-heading">Universidad Católica de Santiago del Estero (UCSE) — DASS</p>
+        <p class="text-slate-300">Cátedra: Laboratorio I (Inteligencia Artificial y Agentes Racionales) &bull; Ciclo Lectivo 2026</p>
+        <p class="text-slate-400">Docente / JTP: Ing. Fabio D. Argañaraz &bull; San Salvador de Jujuy, Argentina</p>
+      </div>
+      <div class="text-center sm:text-right space-y-1">
+        <a href="https://www.ucse.edu.ar/" target="_blank" rel="noopener noreferrer" class="inline-block px-3 py-1.5 rounded-lg bg-[#1569AE] hover:bg-[#0080FB] text-white font-bold transition">
+          🌐 Portal Oficial ucse.edu.ar
+        </a>
+        <p class="text-slate-400">Evaluación protegida con SHA-256 + Normalización &alpha;-Canónica Prolog</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- =========================================================================
+       MODAL 1: PREVISUALIZACIÓN DE PAYLOAD JSON
+  ========================================================================== -->
+  <div id="modal-preview" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-[#023967] border-2 border-[#1569AE] rounded-2xl max-w-3xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="px-5 py-4 bg-[#01305B] text-white flex items-center justify-between">
+        <h3 class="font-extrabold text-sm text-[#FFED00] ucse-heading">👁️ Previsualización en Vivo — respuestas_simulacro.json</h3>
+        <div class="flex items-center gap-2">
+          <button type="button" id="btn-copy-json" class="px-3 py-1 rounded bg-[#FFED00] text-[#01305B] text-xs font-extrabold hover:bg-[#FDD247] transition">
+            📋 Copiar JSON
+          </button>
+          <button type="button" id="btn-close-preview" class="px-2.5 py-1 rounded bg-rose-600 text-white text-xs font-bold hover:bg-rose-500 transition">
+            ✕ Cerrar
+          </button>
+        </div>
+      </div>
+      <pre id="json-preview" class="p-5 text-xs prolog-code text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-[#01182E] overflow-y-auto flex-1"></pre>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 2: MAPA BIBLIOGRÁFICO COMPLETO (TP1 A TP7)
+  ========================================================================== -->
+  <div id="modal-biblio" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-[#023967] border-2 border-[#1569AE] rounded-2xl max-w-4xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="px-5 py-4 bg-[#01305B] text-white flex items-center justify-between">
+        <h3 class="font-extrabold text-sm text-[#FFED00] ucse-heading">📖 Mapa Bibliográfico Oficial de Cátedra — Laboratorio I (UCSE DASS)</h3>
+        <button type="button" id="btn-close-biblio" class="px-2.5 py-1 rounded bg-rose-600 text-white text-xs font-bold hover:bg-rose-500 transition">
+          ✕ Cerrar
+        </button>
+      </div>
+      <div class="p-6 overflow-y-auto space-y-4 text-xs text-slate-700 dark:text-slate-200">
+        <p>Toda la evaluación se fundamenta en el libro de cátedra <a href="http://jdelagarza.fime.uanl.mx/IA/Libros/inteligencia-artificial-un-enfoque-moderno-stuart-j-russell.pdf" target="_blank" rel="noopener noreferrer" class="underline font-bold text-[#1569AE] dark:text-[#FFED00]">Russell, S. &amp; Norvig, P. — Inteligencia Artificial: Un Enfoque Moderno</a> y en las presentaciones oficiales:</p>
+        <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-[#154D80]">
+          <table class="w-full text-left border-collapse">
+            <thead class="bg-[#01305B] text-[#FFED00] uppercase text-[11px]">
+              <tr>
+                <th class="p-3">Sección / Unidad</th>
+                <th class="p-3">Capítulos en Russell &amp; Norvig</th>
+                <th class="p-3">Presentaciones de Cátedra (Ing. Fabio Argañaraz)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 dark:divide-[#154D80]">
+              <tr><td class="p-3 font-bold">Parte I • TP1 (Agentes y PEAS)</td><td class="p-3">Cap. 1 (pp. 1–30), Cap. 2 (pp. 34–58) y Cap. 26 (pp. 1020–1028)</td><td class="p-3">Clases 1, 2 y 3.1</td></tr>
+              <tr><td class="p-3 font-bold">Parte I • TP2 (Búsqueda a Ciegas)</td><td class="p-3">Cap. 3.1 a 3.5 (pp. 64–96, Tabla 3.17)</td><td class="p-3">Clase 3.2: Resolución mediante búsqueda</td></tr>
+              <tr><td class="p-3 font-bold">Parte I • TP3 (Búsqueda Informada)</td><td class="p-3">Cap. 4.1 a 4.3 (pp. 98–121)</td><td class="p-3">Clase 4: Búsqueda informada y exploración</td></tr>
+              <tr><td class="p-3 font-bold">Parte I • TP4 (Conocimiento y LP)</td><td class="p-3">Cap. 7.1 a 7.5 (pp. 194–224)</td><td class="p-3">Clase 5: Conocimiento y Razonamiento</td></tr>
+              <tr><td class="p-3 font-bold">Parte I • TP5 (Lógica Primer Orden)</td><td class="p-3">Cap. 8 (pp. 240–268) y Cap. 9.1–9.5 (pp. 272–308)</td><td class="p-3">Clase 6: Lógica de Primer Orden</td></tr>
+              <tr><td class="p-3 font-bold">Parte II • TP7 (Práctica en Prolog)</td><td class="p-3">Cap. 9.4–9.5 (Resolución SLD, Horn, CWA y NAF)</td><td class="p-3">Clase 7: Lógica aplicada en PROLOG</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 3: GUÍA DE AUTOEVALUACIÓN Y ENTREGA GIT / GITHUB
+  ========================================================================== -->
+  <div id="modal-git" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-[#023967] border-2 border-[#1569AE] rounded-2xl max-w-3xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="px-5 py-4 bg-[#01305B] text-white flex items-center justify-between">
+        <h3 class="font-extrabold text-sm text-[#FFED00] ucse-heading">🐙 Instructivo de Autoevaluación Híbrida (KB + Consultas) y Entrega Git</h3>
+        <button type="button" id="btn-close-git" class="px-2.5 py-1 rounded bg-rose-600 text-white text-xs font-bold hover:bg-rose-500 transition">
+          ✕ Cerrar
+        </button>
+      </div>
+      <div class="p-6 overflow-y-auto space-y-4 text-xs text-slate-700 dark:text-slate-200 leading-relaxed">
+        <p><strong>1. Codificar las Bases de Conocimiento (26 pts) y responder el cuestionario (74 pts):</strong> En cada caso práctico de la Parte II, escribe tus 9 hechos y 2 reglas en el <strong>Editor de Entrega de Base de Conocimientos</strong> (puedes usar el botón <em>Descargar .pl</em> o <em>Cargar .pl</em>). El Linter en vivo verificará que no tengas errores de sintaxis.</p>
+        <p><strong>2. Exportar el archivo JSON unificado:</strong> Al llegar a 34/34 completados (100%), pulsa en <strong>Exportar (.json)</strong> para guardar <code>respuestas_simulacro.json</code> (incluye tanto tus selecciones como el código fuente de tus 2 Bases de Conocimientos).</p>
+        <p><strong>3. Ejecutar el Autoevaluador en Python 3:</strong></p>
+        <pre class="p-3 rounded-lg bg-[#01182E] text-[#FFED00] prolog-code overflow-x-auto">python autograder_simulacro.py respuestas_simulacro.json</pre>
+        <p><strong>4. Confirmar y subir tu entrega al repositorio GitHub:</strong></p>
+        <pre class="p-3 rounded-lg bg-[#01182E] text-[#6EC1E4] prolog-code overflow-x-auto">git add respuestas_simulacro.json *.pl
+git commit -m "Entrega Simulacro de Examen Integrador - [Tu Nombre y Apellido]"
+git push origin main</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lógica Reactiva de la Aplicación -->
+  <script src="app.js"></script>
+</body>
+</html>
