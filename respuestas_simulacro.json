@@ -1,0 +1,66 @@
+{
+  "metadata": {
+    "tp_id": "LAB1-2026-EXAMEN-SIMULACRO",
+    "title": "Simulacro de Examen Integrador: Teoría (TP1–TP5) y Práctica en Prolog (TP7)",
+    "institucion": "Universidad Católica de Santiago del Estero (UCSE) - DASS",
+    "timestamp": "2026-10-31T02:24:36.797Z"
+  },
+  "student": {
+    "nombre": "Emanuel Mariano Lobo",
+    "matricula": "38973583",
+    "email": "mariano_lobo94@hotmail.com",
+    "comision": "Tecnicatura en Automatiacion y Robotica"
+  },
+  "prolog_kb": {
+    "ej6_practica_caso1": ":- discontiguous atiende/2.\n:- discontiguous turno/2.\n:- discontiguous complejidad/2.\n\n% 1. Escribe aquí los 9 hechos (atiende/2, turno/2 y complejidad/2):\natiende(dra_sosa,cardiologia).\nturno(dra_sosa,manana).\ncomplejidad(cardiologia,alta).\natiende(dr_paz,traumatologia).\nturno(dr_paz,noche).\ncomplejidad(traumatologia,alta).\natiende(dra_luna,pediatria).\nturno(dra_luna,manana).\ncomplejidad(pediatria,media).\n% 2. Escribe aquí las 2 reglas (guardia_critica/1 y especialista_manana/2):\nguardia_critica(Medico):-complejidad(Especialidad,alta),atiende(Medico,Especialidad).\nespecialista_manana(Medico,Especialidad):-atiende(Medico,Especialidad),turno(Medico,manana).\n",
+    "ej7_practica_caso2": ":- discontiguous cultivo/2.\n:- discontiguous humedad/2.\n:- discontiguous sistema_riego/2.\n\n% 1. Escribe aquí los 9 hechos (cultivo/2, humedad/2 y sistema_riego/2):\ncultivo(lote_norte,vid).\nhumedad(lote_norte,seco).\nsistema_riego(lote_norte,goteo).\ncultivo(lote_central,olivo).\nhumedad(lote_central,optimo).\nsistema_riego(lote_central,goteo).\ncultivo(lote_sur,tabaco).\nhumedad(lote_sur,seco).\nsistema_riego(lote_sur,aspersion).\n% 2. Escribe aquí las 2 reglas (requiere_riego_urgente/1 y lote_goteo_seco/2):\nrequiere_riego_urgente(Lote):-humedad(Lote,seco).\nlote_goteo_seco(Lote, Especie):-requiere_riego_urgente(Lote),sistema_riego(Lote,goteo),cultivo(Lote,Especie)."
+  },
+  "answers": {
+    "ej1_teoria_tp1": {
+      "item_paradigma_russell_norvig": "pensar_racionalmente_silogismos",
+      "item_funcion_vs_programa": "funcion_mapeo_abstracto_programa_implementacion",
+      "item_peas_vehiculo_autonomo": "sensores_percepcion",
+      "item_test_turing_total": "pln_y_aprendizaje_automatico"
+    },
+    "ej2_teoria_tp2": {
+      "item_formulacion_costo_camino": "estimar_distancia_recta_meta",
+      "item_diferencia_nodo_estado": "puntero_padre_accion_costo_profundidad",
+      "item_bfs_cola_memoria": "pila_lifo_memoria_lineal",
+      "item_dfs_ventaja_desventaja": "garantiza_optimalidad_pero_lenta"
+    },
+    "ej3_teoria_tp3": {
+      "item_voraz_funcion_trampa": "usa_g_mas_h_optima",
+      "item_a_star_significado_f": "f_igual_g_mas_h_costo_estimado_total",
+      "item_a_star_momento_test_meta": "al_generar_sucesor_inmediatamente",
+      "item_definicion_heuristica_admisible": "nunca_sobrestimar_costo_real_optimo"
+    },
+    "ej4_teoria_tp4": {
+      "item_arquitectura_agente_kb": "base_conocimiento_y_motor_inferencia",
+      "item_sintaxis_vs_semantica": "sintaxis_forma_simbolos_semantica_verdad_modelos",
+      "item_propiedad_robustez_soundness": "solo_deriva_sentencias_implicadas_logicamente",
+      "item_clasificacion_sentencia_valida": "valida_tautologia"
+    },
+    "ej5_teoria_tp5": {
+      "item_compromiso_ontologico_lpo": "objetos_relaciones_y_funciones",
+      "item_clasificacion_sintaxis_funcion": "termino_objeto_vs_sentencia_atomica_verdad",
+      "item_cuantificador_universal_conector": "usar_implicacion_evita_afirmar_todo_universo",
+      "item_cuantificador_existencial_conector": "existencial_con_conjuncion_evita_trivialidad"
+    },
+    "ej6_practica_caso1": {
+      "item_proposito_discontiguous_hospital": "permite_agrupar_hechos_por_entidad_sin_warning",
+      "item_consulta_medicos_manana": "turno(Medico, manana).",
+      "item_backtracking_guardia_critica": "dra_sosa_luego_dr_paz_y_false",
+      "item_evaluacion_paz_critica": "true_unifica_traumatologia_complejidad_alta",
+      "item_consulta_especialista_manana_conjuncion": "falla_en_segunda_submeta_turno_manana",
+      "item_evaluacion_luna_critica_cwa": "true_porque_guardia_critica_falla_bajo_cwa"
+    },
+    "ej7_practica_caso2": {
+      "item_convencion_edimburgo_atomos": "lo_interpreta_como_variable_libre_universal",
+      "item_consulta_lotes_goteo": "sistema_riego(Lote, goteo).",
+      "item_backtracking_riego_urgente": "lote_norte_y_lote_sur",
+      "item_resultado_lote_goteo_seco": "lote_norte_y_vid",
+      "item_variable_anonima_agro": "humedad(_, seco).",
+      "item_evaluacion_central_urgente_cwa": "false_humedad_optima_no_unifica_seco"
+    }
+  }
+}
